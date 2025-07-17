@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import { Scenario as IScenario, InterrogateeRole, DifficultyLevel, AIAgentType } from '../types';
+import { Scenario as IScenario, InterrogateeRole, DifficultyLevel } from '../types';
 
 const scenarioSchema = new Schema<IScenario>({
     caseType: { type: String, required: true },
@@ -12,7 +12,7 @@ const scenarioSchema = new Schema<IScenario>({
     userSelectedDifficulty: { type: String, enum: Object.values(DifficultyLevel) },
     userSelectedTopic: { type: String },
     customAgentId: { type: String, required: true },
-    agentType: { type: String, enum: Object.values(AIAgentType), required: true },
+    agentType: { type: String, required: true },
     investigationGoals: [{ type: String }],
     isManuallyCreated: { type: Boolean, default: false },
 });

@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect, Suspense, lazy } from 'react';
 import '@/types'; // Ensure global JSX augmentations from types.ts are loaded
 import { UserRole, User, InvestigationSession, MockTrainee, Scenario, Theme } from '@/types'; // Import Theme from types.ts
@@ -203,7 +201,7 @@ const App: React.FC = () => {
       return (
         <ErrorBoundary>
           <Suspense fallback={loadingFallback}>
-            <TraineeView traineeId={currentUser.id} onSessionComplete={ApiService.saveSession} theme={theme} />
+            <TraineeView traineeIds={[currentUser.id]} onSessionComplete={ApiService.saveSession} theme={theme} />
           </Suspense>
         </ErrorBoundary>
       );

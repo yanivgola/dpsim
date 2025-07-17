@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import { SpeechClient } from '@google-cloud/speech';
 import { GoogleGenAI, GenerateContentResponse } from '@google/genai';
-import { InterrogateeRole, DifficultyLevel, Scenario, LoadedAIAgent, KnowledgeDocument, GeminiJsonScenario, User, UserRole, AIResponseWithDirectives } from './types';
+import { InterrogateeRole, DifficultyLevel, Scenario, LoadedAIAgent, KnowledgeDocument, GeminiJsonScenario, User, UserRole, AIResponseWithDirectives, AIAgent } from './types';
 import * as UserService from './services/UserService';
 import * as AIAgentService from './services/AIAgentService';
 import * as ScenarioService from './services/ScenarioService';
@@ -15,6 +15,8 @@ import jwt from 'jsonwebtoken';
 import mongoose from 'mongoose';
 import { SessionModel } from './models/Session.model';
 import { UserModel } from './models/User.model';
+import { AIAgentModel } from './models/AIAgent.model';
+import { ScenarioModel } from './models/Scenario.model';
 
 // --- Initial Setup ---
 dotenv.config();
@@ -44,7 +46,6 @@ const vrmUpload = multer({ storage: multer.diskStorage({
 const memoryUpload = multer({ storage: multer.memoryStorage() });
 
 // --- Data Loading ---
-let allAgents: LoadedAIAgent[] = [];
 let allDocs: KnowledgeDocument[] = [];
 async function loadData() {
     // This will be replaced by DB calls
@@ -61,9 +62,9 @@ const parseJsonFromResponse = <T,>(responseText: string): T | null => {
     }
 };
 
-const getKnowledgeContextPrompt = (agent: LoadedAIAgent, docs: KnowledgeDocument[]): string => {
+const getKnowledgeContextPrompt = (agent: AIAgent, docs: KnowledgeDocument[]): string => {
     if (!agent.knowledgeBaseIds?.length) return "";
-    const relevantDocs = docs.filter(doc => agent.knowledgeBaseIds.includes(doc.id));
+    const relevantDocs = docs.filter(doc => agent.knowledgeBaseIds!.includes(doc.id));
     if (!relevantDocs.length) return "";
     return `\nBased on the following documents:\n--- DOCUMENT CONTEXT START ---\n${relevantDocs.map(doc => `### Document: ${doc.name} ###\n${doc.content}`).join('\n\n---\n\n')}\n--- DOCUMENT CONTEXT END ---\n`;
 };
@@ -150,12 +151,14 @@ app.post('/api/sessions/:sessionId/complete', async (req, res) => {
 
     if (ai) {
         const feedbackPrompt = `Analyze the following chat transcript and provide detailed feedback...\n\nTranscript:\n${JSON.stringify(chatTranscript, null, 2)}`;
-        const feedbackResponse = await ai.models.generateContent({ model: GEMINI_MODEL_TEXT, contents: [{ role: 'user', parts: [{ text: feedbackPrompt }] }] });
-        const newSession = new SessionModel({ _id: req.params.sessionId, traineeIds: userIds, chatTranscript, endTime: Date.now(), status: 'completed', feedback: { summary: feedbackResponse.response.text() } });
+        const result = await ai.models.generateContent({ model: GEMINI_MODEL_TEXT, contents: [{ role: 'user', parts: [{ text: feedbackPrompt }] }] });
+        const feedbackResponse = result.response;
+        const newSession = new SessionModel({ _id: req.params.sessionId, traineeIds: userIds, chatTranscript, endTime: Date.now(), status: 'completed', feedback: { summary: feedbackResponse.text() } });
         await newSession.save();
     }
     res.status(200).json({ message: 'Session completed.' });
 });
+
 
 // Marketplace
 app.get('/api/marketplace', async (req, res) => {
@@ -166,7 +169,6 @@ app.get('/api/marketplace', async (req, res) => {
 
 // --- LTI (Learning Tools Interoperability) ---
 app.get('/api/lti/config', (req, res) => {
-    // This is a simplified LTI configuration. A real implementation would be more complex.
     const config = {
         title: "Interrogation Simulator",
         description: "An AI-powered interrogation training simulator.",
@@ -178,8 +180,6 @@ app.get('/api/lti/config', (req, res) => {
 });
 
 app.post('/lti/launch', async (req, res) => {
-    // This is a very simplified LTI launch flow.
-    // A real implementation would involve validating the LTI request with a library like 'ltijs'.
     const { email, given_name, family_name } = req.body;
 
     if (!email) {
@@ -191,18 +191,15 @@ app.post('/lti/launch', async (req, res) => {
         user = new UserModel({
             name: `${given_name} ${family_name}`,
             email: email,
-            // A password should be generated or handled differently in a real LTI flow
             password: 'lti_generated_password',
             role: UserRole.TRAINEE
         });
         await user.save();
     }
 
-    // Redirect the user to the application with a token
     const payload = { id: user.id, name: user.name, role: user.role };
     const token = jwt.sign(payload, process.env.JWT_SECRET || 'secret', { expiresIn: '1h' });
 
-    // In a real app, you'd redirect to the frontend with the token in a query param
     res.redirect(`/?lti_token=${token}`);
 });
 
@@ -249,8 +246,9 @@ app.post('/api/generate-scenario', async (req, res) => {
         const historyPrompt = history ? `\nYou have had ${history.sessionIds.length} previous sessions with this user.` : '';
 
         const generationPrompt = UI_TEXT.generateScenarioPrompt.replace('{{...}}', '...'); // simplified
-        const response = await ai.models.generateContent({ model: GEMINI_MODEL_TEXT, contents: [{role: 'user', parts: [{text: generationPrompt}]}], generationConfig: { responseMimeType: "application/json" } });
-        const parsedResponse = parseJsonFromResponse<AIResponseWithDirectives>(response.response.text());
+        const result = await ai.models.generateContent({ model: GEMINI_MODEL_TEXT, contents: [{role: 'user', parts: [{text: generationPrompt}]}]});
+        const response = result.response;
+        const parsedResponse = parseJsonFromResponse<AIResponseWithDirectives>(response.text());
         if (!parsedResponse) return res.status(500).json({ error: "Failed to parse AI response." });
 
         if (parsedResponse.toolCallRequest) {
@@ -261,7 +259,7 @@ app.post('/api/generate-scenario', async (req, res) => {
         if (!geminiScenario) return res.status(500).json({ error: "Failed to parse scenario text." });
 
         const fullSystemPrompt = UI_TEXT.scenarioSystemPromptTemplate.replace('{{...}}', '...'); // simplified
-        const finalScenario: Scenario = { id: `scenario-${Date.now()}`, ...geminiScenario, fullSystemPromptForChat: fullSystemPrompt, customAgentId: agentToUse.id, agentType: agentToUse.agentType, userSelectedDifficulty: difficulty, userSelectedTopic: topic, interrogateeRole: role };
+        const finalScenario: Scenario = { id: `scenario-${Date.now()}`, ...geminiScenario, fullSystemPromptForChat: fullSystemPrompt, customAgentId: agentToUse.id, agentType: agentToUse.agentType || 'interrogation', userSelectedDifficulty: difficulty, userSelectedTopic: topic, interrogateeRole: role };
         res.json(finalScenario);
     } catch (error) {
         res.status(500).json({ error: 'Failed to generate scenario.' });

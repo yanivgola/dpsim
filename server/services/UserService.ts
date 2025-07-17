@@ -57,6 +57,10 @@ export const addSessionToHistory = async (userId: string, agentId: string, sessi
         return;
     }
 
+    if (!user.interactionHistory) {
+        user.interactionHistory = [];
+    }
+
     const historyEntry = user.interactionHistory.find(h => h.agentId === agentId);
 
     if (historyEntry) {

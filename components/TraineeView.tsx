@@ -1,4 +1,3 @@
-
 import '@/types';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
@@ -103,7 +102,7 @@ const TraineeView: React.FC<TraineeViewProps> = ({ traineeIds, onSessionComplete
   const [isSpeechApiSupported, setIsSpeechApiSupported] = useState(true);
   const [microphonePermissionError, setMicrophonePermissionError] = useState<string | null>(null);
 
-  const [isAISpeechOutputEnabled, setIsAISpeechOutputEnabled] = useState<boolean>(!!speechSynthesisAPI);
+  const [isAISpeechOutputEnabled, setIsAISpeechOutputEnabled] = useState<boolean>(true);
   const [isRegularTtsMuted, setIsRegularTtsMuted] = useState<boolean>(false);
 
   const [userWantsLiveAudio, setUserWantsLiveAudio] = useState<boolean>(false);

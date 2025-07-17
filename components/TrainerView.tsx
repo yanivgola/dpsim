@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { User, Theme, UserRole, MockTrainee, InvestigationSession, KnowledgeDocument, Scenario } from '@/types';
 import { UI_TEXT, FEEDBACK_PARAMETER_NAMES } from '@/constants';
@@ -347,6 +345,7 @@ const TraineeAnalyticsContent: React.FC<{ trainee: MockTrainee; theme: Theme }> 
                                 </tr>
                             ))}
                         </tbody>
+                    </table>
                      {completedSessions.length === 0 && <p className="text-center p-4 text-sm themed-text-secondary">אין סשנים שהושלמו.</p>}
                 </div>
             </div>
