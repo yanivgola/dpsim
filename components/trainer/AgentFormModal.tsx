@@ -69,6 +69,28 @@ const AgentFormModal: React.FC<AgentFormModalProps> = ({ isOpen, onClose, onSave
   };
 
 
+  const [uploadStatus, setUploadStatus] = useState('');
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadStatus('Uploading...');
+    const uploadFormData = new FormData();
+    uploadFormData.append('avatar', file);
+
+    try {
+        const response = await axios.post('/api/upload-vrm', uploadFormData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        handleChange('avatarUrl', response.data.filePath);
+        setUploadStatus('Upload successful!');
+    } catch (error) {
+        console.error("Avatar upload failed:", error);
+        setUploadStatus('Upload failed.');
+    }
+  };
+
   const handleSubmit = () => {
     if (!formData.name.trim() || !formData.baseSystemPrompt.trim()) {
       alert('Please fill in at least the agent name and base system prompt.');
@@ -124,6 +146,13 @@ const AgentFormModal: React.FC<AgentFormModalProps> = ({ isOpen, onClose, onSave
           rows={15}
           required
         />
+
+        <div>
+            <label className="block text-sm font-medium themed-text-content">Upload Avatar (.vrm)</label>
+            <Input type="file" accept=".vrm" onChange={handleAvatarUpload} />
+            {uploadStatus && <p className="text-sm mt-1">{uploadStatus}</p>}
+            {formData.avatarUrl && <p className="text-sm mt-1">Current avatar: {formData.avatarUrl}</p>}
+        </div>
         
         <div className="pt-2 border-t themed-border">
             <h4 className="text-md font-semibold mb-2">{UI_TEXT.agentKnowledgeBaseLabel}</h4>

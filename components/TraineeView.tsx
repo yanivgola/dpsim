@@ -313,27 +313,32 @@ const TraineeView: React.FC<TraineeViewProps> = ({ traineeId, onSessionComplete,
   };
   
   const speakAIResponse = (text: string, onEndCallback: () => void = () => {}) => {
-    if (!isAISpeechOutputEnabled || isRegularTtsMuted || !speechSynthesisAPI || text.trim() === '') {
+    if (!isAISpeechOutputEnabled || isRegularTtsMuted || text.trim() === '') {
         onEndCallback();
         return;
     }
-    speechSynthesisAPI.cancel(); // Cancel any previous speech
-    const utterance = new SpeechSynthesisUtterance(text);
-    const hebrewVoice = speechSynthesisVoices.find(v => v.lang === 'he-IL');
-    if (hebrewVoice) {
-      utterance.voice = hebrewVoice;
-    }
-    utterance.onstart = () => setIsAiTyping(true); // Visually "typing" while speaking
-    utterance.onend = () => {
+
+    setIsAiTyping(true);
+    const audio = new Audio(`/api/tts?text=${encodeURIComponent(text)}`);
+
+    audio.oncanplaythrough = () => {
+        audio.play().catch(e => {
+            console.error("Audio playback failed:", e);
+            setIsAiTyping(false);
+            onEndCallback();
+        });
+    };
+
+    audio.onended = () => {
         setIsAiTyping(false);
         onEndCallback();
     };
-    utterance.onerror = (e) => {
-        console.error("Speech synthesis error", e);
+
+    audio.onerror = (e) => {
+        console.error("Error playing TTS audio from backend:", e);
         setIsAiTyping(false);
         onEndCallback();
     };
-    speechSynthesisAPI.speak(utterance);
   };
   
   const handleSendMessage = async () => {
@@ -760,12 +765,12 @@ const TraineeView: React.FC<TraineeViewProps> = ({ traineeId, onSessionComplete,
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       {feedback.parameters.map((param, index) => (
-                          <div key={index}>
-                              <div className="flex justify-between items-baseline">
+                          <div key={index} className="p-4 rounded-lg bg-primary-500/5">
+                              <div className="flex justify-between items-center">
                                   <h4 className="font-semibold themed-text-content">{param.name}</h4>
-                                  <span className="font-bold text-lg themed-text-primary">{param.score}/10</span>
+                                  <span className={`font-bold text-lg px-2 py-1 rounded ${param.score > 7 ? 'bg-green-200 text-green-800' : param.score > 4 ? 'bg-yellow-200 text-yellow-800' : 'bg-red-200 text-red-800'}`}>{param.score}/10</span>
                               </div>
-                              <p className="text-sm themed-text-secondary mt-1">{param.evaluation}</p>
+                              <p className="text-sm themed-text-secondary mt-2">{param.evaluation}</p>
                           </div>
                       ))}
                   </div>

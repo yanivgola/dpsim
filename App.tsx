@@ -270,6 +270,12 @@ const App: React.FC = () => {
               {isLoginView ? UI_TEXT.switchToSignup : UI_TEXT.switchToLogin}
           </button>
 
+          {!isLoginView && (
+            <div className="mt-4 text-xs text-center themed-text-secondary">
+              <p>ברוכים הבאים לסימולטור התשאול המתקדם. צרו חשבון כדי להתחיל להתאמן בתרחישים מציאותיים.</p>
+            </div>
+          )}
+
           {isLoginView && (
             <div className="mt-6">
               <h3 className={`text-sm font-medium mb-2 text-center ${theme === 'light' ? 'text-secondary-700' : 'text-secondary-300'}`}>{UI_TEXT.quickLoginAsDemoUser}</h3>
