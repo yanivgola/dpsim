@@ -7,6 +7,7 @@ import { UI_TEXT } from '@/constants';
 import PageLayout from '@/components/PageLayout';
 import Button from '@/components/common/Button';
 import Input from '@/components/common/Input';
+import DeviceView from '@/components/common/DeviceView';
 import Modal from '@/components/common/Modal';
 import * as ApiService from '@/services/ApiService'; // Use the new ApiService
 import LoadingSpinner from '@/components/common/LoadingSpinner';
@@ -251,53 +252,55 @@ const App: React.FC = () => {
   };
 
   return (
-    <PageLayout currentUserRole={currentUser ? currentUser.role : null} onLogout={handleLogout} toggleTheme={toggleTheme}>
-      {isLoginModalOpen && !currentUser && (
-        <Modal 
-          isOpen={isLoginModalOpen} 
-          onClose={() => { /* Prevent closing by clicking outside or Escape if no user */ }} 
-          title={isLoginView ? UI_TEXT.loginTitle : UI_TEXT.signupTitle}
-          size="md"
-        >
-          {renderAuthForm()}
-          
-          <div className="relative my-4">
-            <div className="absolute inset-0 flex items-center" aria-hidden="true">
-              <div className="w-full border-t border-neutral-300 dark:border-neutral-600"></div>
-            </div>
-            <div className="relative flex justify-center">
-              <span className="px-2 text-xs bg-white dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400">{UI_TEXT.orSeparator}</span>
-            </div>
-          </div>
-          
-          <button onClick={toggleAuthView} className="w-full text-sm font-medium text-primary-600 hover:text-primary-800 dark:text-primary-400 dark:hover:text-primary-200 transition-colors" disabled={isLoading}>
-              {isLoginView ? UI_TEXT.switchToSignup : UI_TEXT.switchToLogin}
-          </button>
+    <DeviceView>
+      <PageLayout currentUserRole={currentUser ? currentUser.role : null} onLogout={handleLogout} toggleTheme={toggleTheme}>
+        {isLoginModalOpen && !currentUser && (
+          <Modal
+            isOpen={isLoginModalOpen}
+            onClose={() => { /* Prevent closing by clicking outside or Escape if no user */ }}
+            title={isLoginView ? UI_TEXT.loginTitle : UI_TEXT.signupTitle}
+            size="md"
+          >
+            {renderAuthForm()}
 
-          {isLoginView && (
-            <div className="mt-6">
-              <h3 className="text-sm font-medium mb-2 text-center text-neutral-700 dark:text-neutral-300">{UI_TEXT.quickLoginAsDemoUser}</h3>
-              <div className="grid grid-cols-2 gap-2">
-                {demoUsers.map(demoUser => (
-                  <Button
-                    key={demoUser.id}
-                    variant="ghost"
-                    size="sm"
-                    className="w-full text-xs"
-                    onClick={() => handleDemoUserLogin(demoUser)}
-                    title={`התחבר כ: ${demoUser.name}`}
-                    disabled={isLoading}
-                  >
-                    {demoUser.name}
-                  </Button>
-                ))}
+            <div className="relative my-4">
+              <div className="absolute inset-0 flex items-center" aria-hidden="true">
+                <div className="w-full border-t border-neutral-300 dark:border-neutral-600"></div>
+              </div>
+              <div className="relative flex justify-center">
+                <span className="px-2 text-xs bg-white dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400">{UI_TEXT.orSeparator}</span>
               </div>
             </div>
-          )}
-        </Modal>
-      )}
-      {renderContent()}
-    </PageLayout>
+
+            <button onClick={toggleAuthView} className="w-full text-sm font-medium text-primary-600 hover:text-primary-800 dark:text-primary-400 dark:hover:text-primary-200 transition-colors" disabled={isLoading}>
+                {isLoginView ? UI_TEXT.switchToSignup : UI_TEXT.switchToLogin}
+            </button>
+
+            {isLoginView && (
+              <div className="mt-6">
+                <h3 className="text-sm font-medium mb-2 text-center text-neutral-700 dark:text-neutral-300">{UI_TEXT.quickLoginAsDemoUser}</h3>
+                <div className="grid grid-cols-2 gap-2">
+                  {demoUsers.map(demoUser => (
+                    <Button
+                      key={demoUser.id}
+                      variant="ghost"
+                      size="sm"
+                      className="w-full text-xs"
+                      onClick={() => handleDemoUserLogin(demoUser)}
+                      title={`התחבר כ: ${demoUser.name}`}
+                      disabled={isLoading}
+                    >
+                      {demoUser.name}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </Modal>
+        )}
+        {renderContent()}
+      </PageLayout>
+    </DeviceView>
   );
 };
 
