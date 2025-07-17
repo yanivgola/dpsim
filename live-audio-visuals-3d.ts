@@ -320,6 +320,23 @@ export class GdmLiveAudioVisuals3D extends LitElement {
       }
   }
 
+  private updateBlinking(time: number) {
+      if (!this.vrm?.expressionManager) return;
+
+      const blinkExpression = this.vrm.expressionManager.getExpression(VRMExpressionPresetName.Blink);
+      if (!blinkExpression) return;
+
+      if (time > this.blinkState.nextBlinkTime) {
+        this.vrm.expressionManager.setValue(VRMExpressionPresetName.Blink, 1.0);
+        this.blinkState.nextBlinkTime = time + 0.1;
+        this.blinkState.isBlinking = true;
+      } else if (this.blinkState.isBlinking) {
+        this.vrm.expressionManager.setValue(VRMExpressionPresetName.Blink, 0.0);
+        this.blinkState.isBlinking = false;
+        this.blinkState.nextBlinkTime = time + 1.0 + Math.random() * 6.0;
+      }
+  }
+
   private updateLipSync() {
     if (!this.outputAnalyser?.data || !this.vrm?.expressionManager) return;
     
@@ -389,7 +406,7 @@ export class GdmLiveAudioVisuals3D extends LitElement {
 
     if (this.vrm) {
       this.updateLipSync();
-      this.updateBlinking(time / 1000); // Pass time in seconds
+      this.updateBlinking(time / 1000);
       this.mixer?.update(deltaTime);
       this.vrm.update(deltaTime);
     } else if (this.sphere) {
