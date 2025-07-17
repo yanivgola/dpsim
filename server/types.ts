@@ -22,6 +22,10 @@ export interface User {
     name: string;
     email: string;
     role: UserRole;
+    interactionHistory?: {
+        agentId: string;
+        sessionIds: string[];
+    }[];
 }
 
 export interface UserWithPassword extends User {
@@ -36,35 +40,12 @@ export interface SuspectProfile {
 
 export type AIAgentType = 'interrogation' | 'information_retrieval' | 'custom_task';
 
-export interface Scenario {
-    id: string;
-    caseType: string;
-    fullCaseDescription: string;
-    interrogateeRole: InterrogateeRole | 'N/A';
-    interrogateeProfile: SuspectProfile | Partial<SuspectProfile>;
-    evidence: { title: string; items: string[] } | { title: string; items: ['N/A'] };
-    fullSystemPromptForChat?: string;
-    userSelectedDifficulty: DifficultyLevel | 'N/A';
-    userSelectedTopic: string;
-    customAgentId: string;
-    agentType: AIAgentType;
-    investigationGoals?: string[];
-    isManuallyCreated?: boolean;
-}
-
-export interface GeminiJsonScenario {
-    caseType: string;
-    fullCaseDescription: string;
-    interrogateeProfile: SuspectProfile;
-    evidence: { title: string; items: string[] };
-    investigationGoals?: string[];
-}
-
 export interface AIAgent {
   id: string;
   name: string;
   description: string;
   baseSystemPrompt: string;
+  authorId?: string;
   isDefault?: boolean;
   isEditable?: boolean;
   personalityTraits?: string[];
@@ -78,6 +59,37 @@ export interface AIAgent {
   };
   knowledgeBaseIds?: string[];
   avatarUrl?: string;
+}
+
+export interface Scenario {
+    id: string;
+    caseType: string;
+    fullCaseDescription: string;
+    authorId?: string;
+    interrogateeRole: InterrogateeRole | 'N/A';
+    interrogateeProfile: SuspectProfile | Partial<SuspectProfile>;
+    evidence: { title: string; items: string[] } | { title: string; items: ['N/A'] };
+    fullSystemPromptForChat?: string;
+    userSelectedDifficulty: DifficultyLevel | 'N/A';
+    userSelectedTopic: string;
+    customAgentId: string;
+    agentType: AIAgentType;
+    investigationGoals?: string[];
+    isManuallyCreated?: boolean;
+}
+
+export interface InvestigationSession {
+    id: string;
+    traineeIds: string[];
+    scenario: Scenario;
+    chatTranscript: any[];
+    startTime: number;
+    endTime?: number;
+    status: string;
+    feedback?: any;
+    initialSelections: any;
+    usedHintsCount: number;
+    investigationLog?: string;
 }
 
 export interface LoadedAIAgent extends AIAgent {
@@ -117,4 +129,12 @@ export interface AIResponseWithDirectives {
         avatarGesture?: string;
     };
     toolCallRequest?: any;
+}
+
+export interface GeminiJsonScenario {
+    caseType: string;
+    fullCaseDescription: string;
+    interrogateeProfile: SuspectProfile;
+    evidence: { title: string; items: string[] };
+    investigationGoals?: string[];
 }
