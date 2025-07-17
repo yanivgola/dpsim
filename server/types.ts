@@ -100,3 +100,21 @@ export interface KnowledgeDocument {
   content: string;
   uploadedAt: number;
 }
+
+export enum ToolName {
+  CHECK_POLICE_DATABASE = 'CHECK_POLICE_DATABASE',
+  GET_CURRENT_TIME_AND_DATE = 'GET_CURRENT_TIME_AND_DATE',
+  GENERAL_KNOWLEDGE_CHECK = 'GENERAL_KNOWLEDGE_CHECK',
+  SEARCH_INTERNAL_ARCHIVES = 'SEARCH_INTERNAL_ARCHIVES',
+  REQUEST_FORENSIC_ANALYSIS = 'REQUEST_FORENSIC_ANALYSIS',
+  POINT_AT_OBJECT = 'POINT_AT_OBJECT',
+}
+
+export interface AIResponseWithDirectives {
+    textResponse: string;
+    directives?: {
+        avatarExpression?: string;
+        avatarGesture?: string;
+    };
+    toolCallRequest?: any;
+}

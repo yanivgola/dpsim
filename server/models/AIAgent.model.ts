@@ -5,6 +5,7 @@ const aiAgentSchema = new Schema<IAIAgent>({
     name: { type: String, required: true },
     description: { type: String },
     baseSystemPrompt: { type: String, required: true },
+    authorId: { type: String },
     isDefault: { type: Boolean, default: false },
     isEditable: { type: Boolean, default: true },
     personalityTraits: [{ type: String }],

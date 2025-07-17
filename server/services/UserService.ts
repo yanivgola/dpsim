@@ -50,3 +50,20 @@ export const deleteUser = async (userId: string): Promise<void> => {
 export const updateUserRole = async (userId: string, role: UserRole): Promise<void> => {
     await UserModel.findByIdAndUpdate(userId, { role });
 };
+
+export const addSessionToHistory = async (userId: string, agentId: string, sessionId: string): Promise<void> => {
+    const user = await UserModel.findById(userId);
+    if (!user) {
+        return;
+    }
+
+    const historyEntry = user.interactionHistory.find(h => h.agentId === agentId);
+
+    if (historyEntry) {
+        historyEntry.sessionIds.push(sessionId);
+    } else {
+        user.interactionHistory.push({ agentId, sessionIds: [sessionId] });
+    }
+
+    await user.save();
+};

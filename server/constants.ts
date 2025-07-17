@@ -19,6 +19,7 @@ export const UI_TEXT = {
     - רמת קושי: {{DIFFICULTY_LEVEL}}
     - נושא החקירה: {{INVESTIGATION_TOPIC}}
     {{AI_PERSONALITY_TRAITS_PROMPT_SECTION}}
+    {{USER_HISTORY_PROMPT_SECTION}}
 
     הפלט חייב להיות אובייקט JSON בלבד, ללא טקסט מקדים או הערות, ובפורמט הבא:
     {

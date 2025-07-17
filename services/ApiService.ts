@@ -64,8 +64,31 @@ export const resetUsersToDefault = (): Promise<void> => Backend.resetUsersToDefa
 
 
 // --- SESSIONS ---
-export const getAllSessions = (): Promise<InvestigationSession[]> => Backend.getAllSessions();
-export const saveSession = (session: InvestigationSession): Promise<void> => Backend.saveSession(session);
+export const getAllSessions = async (): Promise<InvestigationSession[]> => {
+    const response = await axios.get(`${API_BASE_URL}/sessions`);
+    return response.data;
+};
+
+export const getSessionStats = async (): Promise<{ averageScore: number, totalSessions: number }> => {
+    const response = await axios.get(`${API_BASE_URL}/sessions/stats`);
+    return response.data;
+};
+
+export const getMarketplaceData = async (): Promise<{ agents: AIAgent[], scenarios: Scenario[] }> => {
+    const response = await axios.get(`${API_BASE_URL}/marketplace`);
+    return response.data;
+};
+export const saveSession = async (session: InvestigationSession): Promise<void> => {
+    if (session.status === 'completed' && session.traineeIds && session.traineeIds.length > 0 && session.scenario.customAgentId) {
+        await axios.post(`${API_BASE_URL}/sessions/${session.id}/complete`, {
+            userIds: session.traineeIds,
+            agentId: session.scenario.customAgentId,
+            chatTranscript: session.chatTranscript,
+        });
+    }
+    // We will soon remove the local saving of sessions entirely.
+    await Backend.saveSession(session);
+};
 export const clearAllSessions = (): Promise<void> => Backend.clearAllSessions();
 
 // --- Investigation Log ---
@@ -129,7 +152,8 @@ export const generateScenario = async (
     interrogateeRole: InterrogateeRole,
     difficulty: DifficultyLevel,
     topic: string,
-    customAgentId: string
+    customAgentId: string,
+    userId: string
 ): Promise<Scenario | null> => {
     console.log("ApiService: Calling backend to generate scenario...");
     try {
@@ -137,7 +161,8 @@ export const generateScenario = async (
             role: interrogateeRole,
             difficulty,
             topic,
-            agentId: customAgentId
+            agentId: customAgentId,
+            userId,
         });
         console.log("ApiService: Received scenario from backend:", response.data);
         return response.data;

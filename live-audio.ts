@@ -278,6 +278,23 @@ export class GdmLiveAudio extends HTMLElement {
         }
     }
 
+    private async analyzeAndSendAudio(audioData: Float32Array) {
+        const audioBlob = new Blob([audioData], { type: 'audio/l16' });
+        const formData = new FormData();
+        formData.append('audio', audioBlob);
+
+        try {
+            const response = await fetch('/api/analyze-tone', {
+                method: 'POST',
+                body: formData,
+            });
+            const data = await response.json();
+            console.log('Tone analysis response:', data);
+        } catch (error) {
+            console.error('Error analyzing tone:', error);
+        }
+    }
+
     private processAudioInput(event: AudioProcessingEvent): void {
         if (!this.isRecordingUserAudio || !this.liveSession) return;
         if (this._state !== LiveAudioState.STREAMING_USER_AUDIO && this._state !== LiveAudioState.AI_SESSION_OPEN && this._state !== LiveAudioState.PLAYING_AI_AUDIO) {
@@ -285,6 +302,8 @@ export class GdmLiveAudio extends HTMLElement {
         }
 
         const inputData = event.inputBuffer.getChannelData(0);
+        this.analyzeAndSendAudio(inputData); // Analyze tone in parallel
+
         const audioBlobForLiveApi = createAudioBlobForLiveAPI(inputData);
         
         try {

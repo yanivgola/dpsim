@@ -358,7 +358,7 @@ export interface TrainerCommandLogEntry {
 
 export interface InvestigationSession {
   id: string;
-  traineeId: string;
+  traineeIds: string[];
   scenario: Scenario;
   chatTranscript: ChatMessage[];
   startTime: number;
