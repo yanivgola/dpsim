@@ -523,7 +523,22 @@ export type LoadedAIAgent = Omit<AIAgent, 'isDefault' | 'isEditable' | 'personal
     knowledgeBaseIds: string[]; // Ensure it's always an array
 };
 
-export type Theme = 'light' | 'dark';
+export type Theme = {
+  name: string;
+  colors: {
+    primary: string;
+    secondary: string;
+    background: string;
+    text: string;
+    accent: string;
+  };
+};
+
+export enum ThemeName {
+  DEFAULT = 'default',
+  FUTURISTIC = 'futuristic',
+  MINIMALIST = 'minimalist',
+}
 
 // New: For RAG feature
 export interface KnowledgeDocument {

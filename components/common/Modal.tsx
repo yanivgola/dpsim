@@ -121,7 +121,7 @@ const Modal: React.FC<ModalProps> = ({
   const childrenTextColor = "text-neutral-800 dark:text-neutral-200";
 
   const backdropTransitionClass = isOpen ? "opacity-100" : "opacity-0";
-  const modalContentTransitionClass = showContent && isOpen ? "opacity-100 scale-100" : "opacity-0 scale-95";
+  const modalContentTransitionClass = showContent && isOpen ? "opacity-100 scale-100 translate-y-0" : "opacity-0 scale-95 -translate-y-4";
 
 
   return (

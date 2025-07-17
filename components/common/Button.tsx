@@ -20,7 +20,7 @@ const Button: React.FC<ButtonProps> = ({
   iconPosition = 'left',
   ...props
 }) => {
-  const baseStyle = "font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 transition-all duration-200 ease-in-out inline-flex items-center justify-center";
+  const baseStyle = "font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 transition-all duration-300 ease-in-out inline-flex items-center justify-center transform hover:-translate-y-0.5 active:translate-y-0 active:scale-95";
   
   const sizeStyles = {
     sm: "px-3 py-1.5 text-xs rounded",

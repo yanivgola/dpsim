@@ -10,7 +10,7 @@ let manualScenarios: Scenario[] = [];
 let knowledgeDocuments: KnowledgeDocument[] = [];
 let defaultPromptOverride: string | null = null;
 let currentUser: User | null = null;
-let theme: Theme = 'dark';
+let theme: ThemeName = ThemeName.DEFAULT;
 
 const MOCK_TRAINEES_DATA: MockTrainee[] = [
     { id: 'trainer1', name: 'אבירם המנהל', email: 'admin@example.com', password: 'password', role: UserRole.SYSTEM_ADMIN, sessions: [] },
@@ -41,7 +41,9 @@ const initializeBackend = async () => {
 
     try {
         const storedTheme = localStorage.getItem('theme');
-        if (storedTheme) theme = JSON.parse(storedTheme);
+        if (storedTheme && Object.values(ThemeName).includes(storedTheme as ThemeName)) {
+            theme = storedTheme as ThemeName;
+        }
 
         const storedCurrentUser = localStorage.getItem('currentUser');
          if (storedCurrentUser) currentUser = JSON.parse(storedCurrentUser);
@@ -157,10 +159,10 @@ export const getInvestigationLog = async (sessionId: string): Promise<string> =>
 
 
 // --- Theme Management (Still sync with localStorage for instant UI feedback) ---
-export const getTheme = (): Theme => theme;
-export const saveTheme = (newTheme: Theme): void => {
+export const getTheme = (): ThemeName => theme;
+export const saveTheme = (newTheme: ThemeName): void => {
     theme = newTheme;
-    localStorage.setItem('theme', JSON.stringify(newTheme));
+    localStorage.setItem('theme', newTheme);
 };
 
 

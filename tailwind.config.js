@@ -40,5 +40,45 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    require('tailwindcss-themer')({
+      defaultTheme: {
+        extend: {
+          colors: {
+            primary: '#3b82f6',
+            secondary: '#64748b',
+            background: '#ffffff',
+            text: '#0f172a',
+            accent: '#10b981',
+          },
+        },
+      },
+      themes: [
+        {
+          name: 'futuristic',
+          extend: {
+            colors: {
+              primary: '#0ea5e9',
+              secondary: '#4f46e5',
+              background: '#020617',
+              text: '#e2e8f0',
+              accent: '#f43f5e',
+            },
+          },
+        },
+        {
+          name: 'minimalist',
+          extend: {
+            colors: {
+              primary: '#1f2937',
+              secondary: '#9ca3af',
+              background: '#f9fafb',
+              text: '#111827',
+              accent: '#374151',
+            },
+          },
+        },
+      ],
+    }),
+  ],
 }

@@ -10,6 +10,11 @@ import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 const BackIcon = () => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5"><path fillRule="evenodd" d="M7.793 2.232a.75.75 0 01-.025 1.06L3.622 7.25h10.878a.75.75 0 010 1.5H3.622l4.146 3.957a.75.75 0 01-1.036 1.085l-5.5-5.25a.75.75 0 010-1.085l5.5-5.25a.75.75 0 011.06.025z" clipRule="evenodd" /></svg>;
 const AddNodeIcon = () => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5"><path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" /></svg>;
+const StartIcon = () => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4"><path fillRule="evenodd" d="M2 10a.75.75 0 01.75-.75h12.59l-2.1-1.95a.75.75 0 111.02-1.1l3.5 3.25a.75.75 0 010 1.1l-3.5 3.25a.75.75 0 11-1.02-1.1l2.1-1.95H2.75A.75.75 0 012 10z" clipRule="evenodd" /></svg>;
+const InfoIcon = () => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" /></svg>;
+const LieIcon = () => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4"><path fillRule="evenodd" d="M10 1a.75.75 0 01.75.75V3.522l1.347.962a.75.75 0 01-.794 1.32l-1.053-.752v1.301a.75.75 0 01-1.5 0V4.852l-1.053.752a.75.75 0 01-.794-1.32L9.25 3.522V1.75A.75.75 0 0110 1zM5.603 4.203a.75.75 0 011.06 0l1.94 1.94a.75.75 0 01-1.06 1.06l-1.94-1.94a.75.75 0 010-1.06zm8.794 0a.75.75 0 010 1.06l-1.94 1.94a.75.75 0 11-1.06-1.06l1.94-1.94a.75.75 0 011.06 0zM2.5 10a.75.75 0 01.75-.75h1.5a.75.75 0 010 1.5h-1.5a.75.75 0 01-.75-.75zm12.5 0a.75.75 0 01.75-.75h1.5a.75.75 0 010 1.5h-1.5a.75.75 0 01-.75-.75zm-6.25 2.5a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5a.75.75 0 01.75-.75zM5.603 12.203a.75.75 0 011.06 0l1.94 1.94a.75.75 0 01-1.06 1.06l-1.94-1.94a.75.75 0 010-1.06zm7.734 1.06a.75.75 0 10-1.06-1.06l-1.94 1.94a.75.75 0 101.06 1.06l1.94-1.94z" clipRule="evenodd" /></svg>;
+const EventIcon = () => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4"><path d="M11.983 1.904a.75.75 0 00-1.292-.752l-6.5 11.25a.75.75 0 00.645 1.102h4.843a.75.75 0 01.677.43l1.25 2.5a.75.75 0 001.342-.664l-1.25-2.5a.75.75 0 01-.677-.43h-2.34l5.208-9zM15.25 11.25a.75.75 0 00-1.5 0v2.5a.75.75 0 001.5 0v-2.5zM15 6a.75.75 0 01.75-.75h.008a.75.75 0 01.75.75v.008a.75.75 0 01-.75.75h-.008A.75.75 0 0115 6z" /></svg>;
+const GoalIcon = () => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-11.25a.75.75 0 00-1.5 0v2.5h-2.5a.75.75 0 000 1.5h2.5v2.5a.75.75 0 001.5 0v-2.5h2.5a.75.75 0 000-1.5h-2.5v-2.5z" clipRule="evenodd" /></svg>;
 
 const emptyScenario: Omit<Scenario, 'id'> = {
   caseType: '',
@@ -29,8 +34,18 @@ const emptyScenario: Omit<Scenario, 'id'> = {
 interface ScenarioBuilderViewProps {
   scenario: Scenario | null;
   onBack: () => void;
-  theme: Theme;
 }
+
+const getNodeIcon = (nodeType: ScenarioNodeType) => {
+    switch (nodeType) {
+        case 'start': return <StartIcon />;
+        case 'info': return <InfoIcon />;
+        case 'lie': return <LieIcon />;
+        case 'event': return <EventIcon />;
+        case 'goal': return <GoalIcon />;
+        default: return null;
+    }
+};
 
 const getEdgePath = (startPos: { x: number; y: number }, endPos: { x: number; y: number }) => {
     const cpx1 = startPos.x;
@@ -43,7 +58,7 @@ const getEdgePath = (startPos: { x: number; y: number }, endPos: { x: number; y:
 const NODE_WIDTH = 120;
 const NODE_HEIGHT = 48;
 
-const ScenarioBuilderView: React.FC<ScenarioBuilderViewProps> = ({ scenario: initialScenario, onBack, theme }) => {
+const ScenarioBuilderView: React.FC<ScenarioBuilderViewProps> = ({ scenario: initialScenario, onBack }) => {
     const [scenario, setScenario] = useState<Scenario>(emptyScenario as Scenario);
     const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
     const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null);
@@ -220,7 +235,7 @@ const ScenarioBuilderView: React.FC<ScenarioBuilderViewProps> = ({ scenario: ini
         return {
             base: `absolute p-2 rounded-lg text-white shadow-lg cursor-grab active:cursor-grabbing transition-all duration-200 flex flex-col items-center justify-center text-center`,
             color: colors[node.type] || 'bg-gray-500',
-            border: selectedNodeId === node.id ? `ring-2 ring-offset-2 ${theme==='light' ? 'ring-offset-gray-100' : 'ring-offset-gray-800'} ${borderColors[node.type]}` : ''
+            border: selectedNodeId === node.id ? `ring-2 ring-offset-2 ring-offset-neutral-100 dark:ring-offset-neutral-800 ${borderColors[node.type]}` : ''
         };
     };
     const handleClass = 'absolute w-3 h-3 rounded-full bg-white border-2 hover:scale-125 transition-transform';
@@ -229,17 +244,17 @@ const ScenarioBuilderView: React.FC<ScenarioBuilderViewProps> = ({ scenario: ini
 
     return (
         <div className="flex flex-col h-screen" dir="rtl">
-            <header className={`flex-shrink-0 p-3 flex justify-between items-center border-b ${theme === 'light' ? 'bg-white border-secondary-200' : 'bg-secondary-800 border-secondary-700'}`}>
+            <header className="flex-shrink-0 p-3 flex justify-between items-center border-b bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700">
                 <div className="flex items-center space-x-4 rtl:space-x-reverse">
                     <Button variant="ghost" onClick={onBack} icon={<BackIcon />}>{UI_TEXT.backToDashboard}</Button>
-                    <h1 className="text-xl font-bold themed-text-primary hidden sm:block">בונה התרחישים הוויזואלי</h1>
+                    <h1 className="text-xl font-bold text-primary-600 dark:text-primary-400 hidden sm:block">בונה התרחישים הוויזואלי</h1>
                 </div>
                 <Button onClick={handleSave} isLoading={isSaving}>{UI_TEXT.save}</Button>
             </header>
 
             <div className="flex-grow flex flex-row overflow-hidden">
-                <aside className={`w-1/4 min-w-[300px] max-w-[400px] p-4 border-l overflow-y-auto ${theme === 'light' ? 'bg-secondary-50 border-secondary-200' : 'bg-secondary-900 border-secondary-700'}`}>
-                    <h2 className="text-lg font-bold mb-4 themed-text-primary">{UI_TEXT.manualScenarioSettingsTitle || "הגדרות תרחיש"}</h2>
+                <aside className="w-1/4 min-w-[300px] max-w-[400px] p-4 border-l overflow-y-auto bg-neutral-50 dark:bg-neutral-900 border-neutral-200 dark:border-neutral-700">
+                    <h2 className="text-lg font-bold mb-4 text-primary-600 dark:text-primary-400">{UI_TEXT.manualScenarioSettingsTitle || "הגדרות תרחיש"}</h2>
                     <div className="space-y-4">
                         <Input label={UI_TEXT.manualScenarioNameLabel} value={scenario.caseType} onChange={(e) => handleScenarioChange('caseType', e.target.value)} required />
                         <Textarea label={UI_TEXT.manualScenarioDescriptionLabel} value={scenario.fullCaseDescription} onChange={(e) => handleScenarioChange('fullCaseDescription', e.target.value)} rows={2} />
@@ -250,14 +265,14 @@ const ScenarioBuilderView: React.FC<ScenarioBuilderViewProps> = ({ scenario: ini
                     </div>
                 </aside>
 
-                <main ref={canvasRef} onMouseMove={handleCanvasMouseMove} onMouseUp={handleCanvasMouseUp} onClick={handleCanvasClick} className={`flex-grow relative overflow-hidden ${theme === 'light' ? 'bg-secondary-100' : 'bg-secondary-800'}`}>
+                <main ref={canvasRef} onMouseMove={handleCanvasMouseMove} onMouseUp={handleCanvasMouseUp} onClick={handleCanvasClick} className="flex-grow relative overflow-hidden bg-neutral-100 dark:bg-neutral-800">
                     <svg className="absolute inset-0 w-full h-full" style={{ zIndex: 0 }}>
                        <defs>
                          <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                           <path d="M 0 0 L 10 5 L 0 10 z" fill={theme === 'light' ? '#64748b' : '#94a3b8'} />
+                           <path d="M 0 0 L 10 5 L 0 10 z" className="fill-neutral-500 dark:fill-neutral-400" />
                          </marker>
                          <marker id="arrow-selected" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                           <path d="M 0 0 L 10 5 L 0 10 z" fill="#60a5fa" />
+                           <path d="M 0 0 L 10 5 L 0 10 z" className="fill-primary-500" />
                          </marker>
                        </defs>
                        {scenario.flow?.edges.map((edge) => {
@@ -269,15 +284,15 @@ const ScenarioBuilderView: React.FC<ScenarioBuilderViewProps> = ({ scenario: ini
                            const pathData = getEdgePath(startPos, endPos);
                            const isSelected = selectedEdgeId === edge.id;
                            const pathId = `path-${edge.id}`;
-                           const strokeColor = isSelected ? "#60a5fa" : (theme === 'light' ? '#64748b' : '#94a3b8');
+                           const strokeColor = isSelected ? "stroke-primary-500" : "stroke-neutral-500 dark:stroke-neutral-400";
 
                            return (
                              <g key={edge.id}>
                                <path d={pathData} stroke="transparent" strokeWidth="20" fill="none" onClick={(e) => handleEdgeClick(e, edge.id)} style={{ cursor: 'pointer' }} />
-                               <path id={pathId} d={pathData} stroke={strokeColor} strokeWidth={isSelected ? "3" : "2"} fill="none" markerEnd={isSelected ? "url(#arrow-selected)" : "url(#arrow)"} />
+                               <path id={pathId} d={pathData} className={strokeColor} strokeWidth={isSelected ? "3" : "2"} fill="none" markerEnd={isSelected ? "url(#arrow-selected)" : "url(#arrow)"} />
                                {edge.label && (
-                                   <text dy="-5" fontSize="10px" style={{paintOrder: 'stroke', stroke: theme === 'light' ? '#f1f5f9' : '#1e293b', strokeWidth: '3px', strokeLinecap: 'butt', strokeLinejoin: 'miter'}}>
-                                       <textPath href={`#${pathId}`} startOffset="50%" textAnchor="middle" fill={theme === 'light' ? '#0f172a' : '#f1f5f9'}>
+                                   <text dy="-5" fontSize="10px" className="fill-neutral-900 dark:fill-neutral-100" style={{paintOrder: 'stroke', stroke: 'var(--bg-color)', strokeWidth: '3px', strokeLinecap: 'butt', strokeLinejoin: 'miter'}}>
+                                       <textPath href={`#${pathId}`} startOffset="50%" textAnchor="middle">
                                            {edge.label}
                                        </textPath>
                                    </text>
@@ -295,17 +310,20 @@ const ScenarioBuilderView: React.FC<ScenarioBuilderViewProps> = ({ scenario: ini
                         return (
                              <div key={node.id} onMouseDown={(e) => handleNodeMouseDown(e, node.id)} className={`${style.base} ${style.color} ${style.border}`} style={{ top: `${node.position.y}px`, left: `${node.position.x}px`, width: `${NODE_WIDTH}px`, height: `${NODE_HEIGHT}px`, zIndex: 1 }}>
                                 <div onMouseUp={(e) => handleHandleMouseUp(e, node.id, 'input')} className={`${handleClass} border-cyan-400`} style={{ top: '-6px', left: 'calc(50% - 6px)' }}></div>
-                                <p className="font-bold text-sm truncate max-w-full px-1 pointer-events-none">{node.title}</p>
+                                <div className="flex items-center space-x-2 rtl:space-x-reverse pointer-events-none">
+                                    {getNodeIcon(node.type)}
+                                    <p className="font-bold text-sm truncate max-w-full px-1">{node.title}</p>
+                                </div>
                                 <div onMouseDown={(e) => handleHandleMouseDown(e, node.id, 'output')} className={`${handleClass} border-pink-400`} style={{ bottom: '-6px', left: 'calc(50% - 6px)' }}></div>
                             </div>
                         )
                     })}
                 </main>
 
-                <aside className={`w-1/4 min-w-[300px] max-w-[400px] p-4 border-r overflow-y-auto ${theme === 'light' ? 'bg-secondary-50 border-secondary-200' : 'bg-secondary-900 border-secondary-700'}`}>
+                <aside className="w-1/4 min-w-[300px] max-w-[400px] p-4 border-r overflow-y-auto bg-neutral-50 dark:bg-neutral-900 border-neutral-200 dark:border-neutral-700">
                     {selectedNode && (
                         <div className="space-y-4">
-                             <h2 className="text-lg font-bold themed-text-primary">{UI_TEXT.nodeInspectorTitle || "פרטי צומת"}</h2>
+                             <h2 className="text-lg font-bold text-primary-600 dark:text-primary-400">{UI_TEXT.nodeInspectorTitle || "פרטי צומת"}</h2>
                              <Input label={UI_TEXT.nodeTitleLabel || "כותרת"} value={selectedNode.title} onChange={(e) => handleNodeChange(selectedNodeId!, 'title', e.target.value)} />
                              <Select label={UI_TEXT.nodeTypeLabel || "סוג"} value={selectedNode.type} onChange={e => handleNodeChange(selectedNodeId!, 'type', e.target.value as ScenarioNodeType)} options={[
                                 {value: 'start', label: 'נקודת התחלה'}, {value: 'info', label: 'מידע'}, {value: 'lie', label: 'שקר'}, {value: 'event', label: 'אירוע'}, {value: 'goal', label: 'מטרה'}
@@ -316,7 +334,7 @@ const ScenarioBuilderView: React.FC<ScenarioBuilderViewProps> = ({ scenario: ini
                     )}
                     {selectedEdge && (
                          <div className="space-y-4">
-                             <h2 className="text-lg font-bold themed-text-primary">פרטי חיבור</h2>
+                             <h2 className="text-lg font-bold text-primary-600 dark:text-primary-400">פרטי חיבור</h2>
                              <Textarea 
                                 label="תווית תנאי (אופציונלי)" 
                                 placeholder="לדוגמה: אם החשוד מכחיש"
@@ -328,14 +346,14 @@ const ScenarioBuilderView: React.FC<ScenarioBuilderViewProps> = ({ scenario: ini
                         </div>
                     )}
                     {!selectedNode && !selectedEdge && (
-                        <div className="text-center themed-text-secondary pt-10">
+                        <div className="text-center text-neutral-500 dark:text-neutral-400 pt-10">
                             <h2 className="text-lg font-bold mb-4">{UI_TEXT.addNodePrompt || "הוסף צומת חדש"}</h2>
                              <div className="grid grid-cols-2 gap-2">
-                                 <Button onClick={() => addNode('start')} icon={<AddNodeIcon/>}>התחלה</Button>
-                                 <Button onClick={() => addNode('info')} icon={<AddNodeIcon/>}>מידע</Button>
-                                 <Button onClick={() => addNode('lie')} icon={<AddNodeIcon/>}>שקר</Button>
-                                 <Button onClick={() => addNode('event')} icon={<AddNodeIcon/>}>אירוע</Button>
-                                 <Button onClick={() => addNode('goal')} icon={<AddNodeIcon/>}>מטרה</Button>
+                                 <Button onClick={() => addNode('start')} icon={<StartIcon/>}>התחלה</Button>
+                                 <Button onClick={() => addNode('info')} icon={<InfoIcon/>}>מידע</Button>
+                                 <Button onClick={() => addNode('lie')} icon={<LieIcon/>}>שקר</Button>
+                                 <Button onClick={() => addNode('event')} icon={<EventIcon/>}>אירוע</Button>
+                                 <Button onClick={() => addNode('goal')} icon={<GoalIcon/>}>מטרה</Button>
                              </div>
                         </div>
                     )}

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, Suspense, lazy } from 'react';
 import '@/types'; // Ensure global JSX augmentations from types.ts are loaded
-import { UserRole, User, InvestigationSession, MockTrainee, Scenario, Theme } from '@/types'; // Import Theme from types.ts
+import { UserRole, User, InvestigationSession, MockTrainee, Scenario, Theme, ThemeName } from '@/types'; // Import Theme from types.ts
 import { UI_TEXT } from '@/constants';
 import PageLayout from '@/components/PageLayout';
 import Button from '@/components/common/Button';
@@ -66,7 +66,7 @@ const App: React.FC = () => {
   const [error, setError] = useState<string>('');
   const [isLoginModalOpen, setIsLoginModalOpen] = useState<boolean>(true);
   const [isLoginView, setIsLoginView] = useState<boolean>(true);
-  const [theme, setTheme] = useState<Theme>(() => ApiService.getTheme());
+  const [theme, setTheme] = useState<ThemeName>(() => ApiService.getTheme());
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [demoUsers, setDemoUsers] = useState<MockTrainee[]>([]);
   const [isAppLoading, setIsAppLoading] = useState(true);
@@ -89,7 +89,9 @@ const App: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (theme === 'dark') {
+    document.body.className = '';
+    document.body.classList.add(`theme-${theme}`);
+    if (theme === ThemeName.FUTURISTIC) {
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark');
@@ -98,7 +100,10 @@ const App: React.FC = () => {
   }, [theme]);
 
   const toggleTheme = () => {
-    setTheme(prevTheme => (prevTheme === 'light' ? 'dark' : 'light'));
+    const themeValues = Object.values(ThemeName);
+    const currentIndex = themeValues.indexOf(theme);
+    const nextIndex = (currentIndex + 1) % themeValues.length;
+    setTheme(themeValues[nextIndex]);
   };
 
   const handleLogin = async (userEmail?: string, userPassword?: string) => {
