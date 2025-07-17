@@ -1,0 +1,274 @@
+
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>סימולטור תשאול - ענף שיטור דיגיטלי</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class', // Enable class-based dark mode
+      theme: {
+        extend: {
+          colors: {
+            primary: {"50":"#eff6ff","100":"#dbeafe","200":"#bfdbfe","300":"#93c5fd","400":"#60a5fa","500":"#3b82f6","600":"#2563eb","700":"#1d4ed8","800":"#1e40af","900":"#1e3a8a","950":"#172554"},
+            secondary: {"50":"#f8fafc","100":"#f1f5f9","200":"#e2e8f0","300":"#cbd5e1","400":"#94a3b8","500":"#64748b","600":"#475569","700":"#334155","800":"#1e293b","900":"#0f172a","950":"#020617"}
+          },
+          fontFamily: {
+            sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', 'sans-serif', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'],
+          }
+        }
+      }
+    }
+  </script>
+  <script>
+    // Global error handler - Simplified for better diagnostics
+    window.onerror = function(message, source, lineno, colno, error) {
+      console.error("Critical Uncaught Error:", {
+        message: message,
+        source: source,
+        lineno: lineno,
+        colno: colno,
+        errorObject: error
+      });
+      // Return false to allow default browser error handling,
+      // which might provide more direct feedback on the screen for some errors.
+      return false; 
+    };
+  </script>
+  <style>
+    /* Base styles (Dark theme by default) */
+    body {
+      background-color: #0f172a; /* secondary-900 */
+      color: #e2e8f0; /* secondary-200 */
+      font-family: tailwind.config.theme.extend.fontFamily.sans;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      margin: 0;
+      height: 100vh;
+      overflow: hidden;
+      line-height: 1.6; /* Base line-height for general readability */
+    }
+    #root {
+      height: 100%;
+      overflow-y: auto;
+    }
+
+    /* Light theme overrides */
+    html.light-theme body {
+      background-color: #f8fafc; /* secondary-50 */
+      color: #0f172a; /* secondary-900 */
+    }
+
+    /* Scrollbar styling */
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #1e293b; /* secondary-800 */
+      border-radius: 10px;
+    }
+    html.light-theme ::-webkit-scrollbar-track {
+      background: #e2e8f0; /* secondary-200 */
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155; /* secondary-700 */
+      border-radius: 10px;
+    }
+    html.light-theme ::-webkit-scrollbar-thumb {
+      background: #cbd5e1; /* secondary-300 */
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #475569; /* secondary-600 */
+    }
+    html.light-theme ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8; /* secondary-400 */
+    }
+
+    /* Themed Card */
+    .themed-card {
+      background-color: #1e293b; /* secondary-800 */
+      color: #e2e8f0; /* secondary-200 */
+      border: 1px solid #334155; /* secondary-700 */
+    }
+    html.light-theme .themed-card {
+      background-color: #ffffff;
+      color: #1e293b; /* secondary-800 text on light bg */
+      border: 1px solid #e2e8f0; /* secondary-200 */
+      box-shadow: 0 1px 3px 0 rgba(0,0,0,0.07), 0 1px 2px 0 rgba(0,0,0,0.05);
+    }
+
+    /* Themed Card Header */
+    .themed-card-header {
+      color: #93c5fd; /* primary-300 */
+      border-bottom-color: #334155; /* secondary-700 */
+    }
+    html.light-theme .themed-card-header {
+      color: #1d4ed8; /* primary-700 */
+      border-bottom-color: #e2e8f0; /* secondary-200 */
+    }
+
+    /* Themed Input and Select */
+    .themed-input, .themed-select {
+      background-color: #334155; /* secondary-700 */
+      border-color: #475569; /* secondary-600 */
+      color: #f1f5f9; /* secondary-100 */
+    }
+    .themed-input::placeholder, .themed-select::placeholder { /* Select doesn't have placeholder attr */
+      color: #94a3b8; /* secondary-400 */
+    }
+    .themed-input:focus, .themed-select:focus {
+      border-color: #60a5fa; /* primary-400 */
+      /* ring-color: #60a5fa; Tailwind handles ring for focus */
+    }
+    html.light-theme .themed-input, html.light-theme .themed-select {
+      background-color: #ffffff;
+      border-color: #cbd5e1; /* secondary-300 */
+      color: #0f172a; /* secondary-900 */
+    }
+    html.light-theme .themed-input::placeholder, html.light-theme .themed-select::placeholder {
+      color: #94a3b8; /* secondary-400 */
+    }
+    html.light-theme .themed-input:focus, html.light-theme .themed-select:focus {
+      border-color: #3b82f6; /* primary-500 */
+      /* ring-color: #3b82f6; */
+    }
+    
+    /* Themed Text Colors */
+    .themed-text-primary { color: #93c5fd; /* primary-300 or 400 */ }
+    html.light-theme .themed-text-primary { color: #2563eb; /* primary-600 */ }
+    
+    .themed-text-secondary { color: #cbd5e1; /* secondary-300 */ }
+    html.light-theme .themed-text-secondary { color: #475569; /* secondary-600 */ }
+
+    .themed-text-content { color: #e2e8f0; /* secondary-200 */ }
+    html.light-theme .themed-text-content { color: #1e293b; /* secondary-800 */ }
+
+    /* Themed Border */
+    .themed-border { border-color: #334155; /* secondary-700 */ }
+    html.light-theme .themed-border { border-color: #e2e8f0; /* secondary-200 */ }
+
+
+    /* Scenario Details Specifics from TraineeView */
+    .scenario-details-content strong {
+      font-weight: 600; /* Semibold for labels */
+      margin-bottom: 0.1rem; 
+      display: inline-block; 
+    }
+    html.light-theme .scenario-details-content strong {
+      /* color: #1e3a8a; /* primary-900 if needed */
+    }
+    .scenario-details-content p, .scenario-details-content li {
+      line-height: 1.7; /* Increased line-height */
+      margin-bottom: 0.5rem; /* Add some space below paragraphs/list items */
+    }
+
+
+    .scenario-section-title {
+      font-size: 1.125rem; /* text-lg */
+      font-weight: 600; /* semibold */
+      color: #60a5fa; /* primary-400 (dark theme) */
+      margin-top: 1rem;
+      margin-bottom: 0.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom-width: 1px;
+      border-color: #334155; /* secondary-700 (dark theme) */
+    }
+    html.light-theme .scenario-section-title {
+      color: #2563eb; /* primary-600 (light theme) */
+      border-color: #cbd5e1; /* secondary-300 (light theme) */
+    }
+
+    /* ChatBubble specific styling for system messages if needed */
+    html.light-theme .system-chat-bubble {
+        background-color: #eef2ff; /* primary-50 */
+        color: #3730a3; /* primary-800 */
+        border-color: #c7d2fe; /* primary-200 */
+    }
+    /* AI bubble in light theme */
+    html.light-theme .ai-chat-bubble {
+        background-color: #f1f5f9; /* secondary-100 */
+        color: #1e293b; /* secondary-800 */
+        border-color: #cbd5e1; /* secondary-300 */
+    }
+    html.light-theme .ai-chat-bubble .time-text {
+        color: #64748b; /* secondary-500 */
+    }
+    /* User bubble in light theme */
+    html.light-theme .user-chat-bubble {
+        background-color: #2563eb; /* primary-600 */
+        color: #ffffff;
+    }
+     html.light-theme .user-chat-bubble .time-text {
+        color: #dbeafe; /* primary-100 */
+    }
+
+  </style>
+<script type="importmap">
+{
+  "imports": {
+    "@google/genai": "https://esm.sh/@google/genai@^0.9.0",
+    "react": "https://esm.sh/react@^19.1.0",
+    "react/jsx-runtime": "https://esm.sh/react@^19.1.0/jsx-runtime",
+    "react-dom/client": "https://esm.sh/react-dom@^19.1.0/client",
+    "lit": "https://esm.sh/lit@^3.3.0",
+    "lit/": "https://esm.sh/lit@^3.3.0/",
+    "@lit/context": "https://esm.sh/@lit/context@^1.1.5",
+    "three": "https://esm.sh/three@^0.176.0",
+    "three/": "https://esm.sh/three@^0.176.0/",
+    "three/addons/loaders/GLTFLoader.js": "https://esm.sh/three@^0.176.0/examples/jsm/loaders/GLTFLoader.js",
+    "three/addons/controls/OrbitControls.js": "https://esm.sh/three@^0.176.0/examples/jsm/controls/OrbitControls.js",
+    "three/addons/loaders/EXRLoader.js": "https://esm.sh/three@0.176.0/examples/jsm/loaders/EXRLoader.js",
+    "three/addons/postprocessing/EffectComposer.js": "https://esm.sh/three@0.176.0/examples/jsm/postprocessing/EffectComposer.js",
+    "three/addons/postprocessing/RenderPass.js": "https://esm.sh/three@0.176.0/examples/jsm/postprocessing/RenderPass.js",
+    "three/addons/postprocessing/ShaderPass.js": "https://esm.sh/three@0.176.0/examples/jsm/postprocessing/ShaderPass.js",
+    "three/addons/postprocessing/UnrealBloomPass.js": "https://esm.sh/three@0.176.0/examples/jsm/postprocessing/UnrealBloomPass.js",
+    "three/addons/shaders/FXAAShader.js": "https://esm.sh/three@0.176.0/examples/jsm/shaders/FXAAShader.js",
+    "@pixiv/three-vrm": "https://esm.sh/@pixiv/three-vrm@2.0.11",
+    "react-dom/": "https://esm.sh/react-dom@^19.1.0/",
+    "react/": "https://esm.sh/react@^19.1.0/",
+    "@/App": "/App.tsx",
+    "@/components/TrainerView": "/components/TrainerView.tsx",
+    "@/components/TraineeView": "/components/TraineeView.tsx",
+    "@/types": "/types.ts",
+    "@/constants": "/constants.ts",
+    "@/services/ApiService": "/services/ApiService.ts",
+    "@/services/BackendService": "/services/BackendService.ts",
+    "@/services/GeminiService": "/services/GeminiService.ts",
+    "@/components/PageLayout": "/components/PageLayout.tsx",
+    "@/components/ChatBubble": "/components/ChatBubble.tsx",
+    "@/components/common/Button": "/components/common/Button.tsx",
+    "@/components/common/Input": "/components/common/Input.tsx",
+    "@/components/common/LoadingSpinner": "/components/common/LoadingSpinner.tsx",
+    "@/components/common/Modal": "/components/common/Modal.tsx",
+    "@/components/common/Select": "/components/common/Select.tsx",
+    "@/components/common/Textarea": "/components/common/Textarea.tsx",
+    "@/components/common/ToggleSwitch": "/components/common/ToggleSwitch.tsx",
+    "@/components/common/ErrorBoundary": "/components/common/ErrorBoundary.tsx",
+    "@/components/trainer/AgentFormModal": "/components/trainer/AgentFormModal.tsx",
+    "@/components/trainer/LiveInterventionTab": "/components/trainer/LiveInterventionTab.tsx",
+    "@/components/trainer/ManageAIAgentsTab": "/components/trainer/ManageAIAgentsTab.tsx",
+    "@/components/trainer/ManageUsersTab": "/components/trainer/ManageUsersTab.tsx",
+    "@/components/trainer/ManualScenarioBuilderTab": "/components/trainer/ManualScenarioBuilderTab.tsx",
+    "@/components/trainer/ScenarioBuilderView": "/components/trainer/ScenarioBuilderView.tsx",
+    "@/components/trainer/SettingsTab": "/components/trainer/SettingsTab.tsx",
+    "@/live-audio": "/live-audio.ts",
+    "@/live-audio-visuals-3d": "/live-audio-visuals-3d.ts",
+    "@/live-audio-utils": "/live-audio-utils.ts",
+    "@/live-audio-analyzer": "/live-audio-analyzer.ts",
+    "@/live-audio-sphere-shader": "/live-audio-sphere-shader.ts",
+    "@/live-audio-backdrop-shader": "/live-audio-backdrop-shader.ts"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body>
+  <div id="root"></div>
+  <!-- gdm-live-audio element removed from here. It will be managed by React in TraineeView.tsx -->
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>

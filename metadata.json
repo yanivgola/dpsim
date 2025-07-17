@@ -1,0 +1,8 @@
+{
+  "requestFramePermissions": [
+    "microphone"
+  ],
+  "name": "סימולטור כולל אפשרות להוסיף סוכנים נוספים",
+  "description": "סימולטור כולל אפשרות להוסיף סוכנים נוספים",
+  "prompt": ""
+}
