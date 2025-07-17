@@ -254,7 +254,26 @@ export class GdmLiveAudioVisuals3D extends LitElement {
     }
   }
 
+  private pointAtObject(objectName: string) {
+    if (!this.vrm || !this.scene) return;
+
+    const targetObject = this.scene.getObjectByName(objectName);
+    if (!targetObject) return;
+
+    const rightHand = this.vrm.humanoid.getBoneNode(THREE.VRMHumanoidBoneName.RightHand);
+    if (rightHand) {
+        // This is a simplified "point at". A real implementation would use IK.
+        rightHand.lookAt(targetObject.position);
+    }
+  }
+
   private handleGestureVisual(gesture: string) {
+    if (gesture.startsWith('point_at_')) {
+        const objectName = gesture.substring('point_at_'.length);
+        this.pointAtObject(objectName);
+        return;
+    }
+
     if (this.vrm && this.mixer && this.animationActions.size > 0) {
       const gestureName = gesture.toLowerCase();
       const action = this.animationActions.get(gestureName);
@@ -312,6 +331,23 @@ export class GdmLiveAudioVisuals3D extends LitElement {
       if (time > this.blinkState.nextBlinkTime) {
         this.vrm.expressionManager.setValue(VRMExpressionPresetName.Blink, 1.0);
         this.blinkState.nextBlinkTime = time + 0.1; 
+        this.blinkState.isBlinking = true;
+      } else if (this.blinkState.isBlinking) {
+        this.vrm.expressionManager.setValue(VRMExpressionPresetName.Blink, 0.0);
+        this.blinkState.isBlinking = false;
+        this.blinkState.nextBlinkTime = time + 1.0 + Math.random() * 6.0;
+      }
+  }
+
+  private updateBlinking(time: number) {
+      if (!this.vrm?.expressionManager) return;
+
+      const blinkExpression = this.vrm.expressionManager.getExpression(VRMExpressionPresetName.Blink);
+      if (!blinkExpression) return;
+
+      if (time > this.blinkState.nextBlinkTime) {
+        this.vrm.expressionManager.setValue(VRMExpressionPresetName.Blink, 1.0);
+        this.blinkState.nextBlinkTime = time + 0.1;
         this.blinkState.isBlinking = true;
       } else if (this.blinkState.isBlinking) {
         this.vrm.expressionManager.setValue(VRMExpressionPresetName.Blink, 0.0);
@@ -389,7 +425,7 @@ export class GdmLiveAudioVisuals3D extends LitElement {
 
     if (this.vrm) {
       this.updateLipSync();
-      this.updateBlinking(time / 1000); // Pass time in seconds
+      this.updateBlinking(time / 1000);
       this.mixer?.update(deltaTime);
       this.vrm.update(deltaTime);
     } else if (this.sphere) {
@@ -592,6 +628,14 @@ export class GdmLiveAudioVisuals3D extends LitElement {
     folder.rotation.y = 0.2;
     folder.castShadow = true;
     this.scene.add(folder);
+
+    const keyMaterial = new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 1, roughness: 0.2 });
+    const keyGeo = new THREE.BoxGeometry(0.02, 0.1, 0.01);
+    const key = new THREE.Mesh(keyGeo, keyMaterial);
+    key.name = "key"; // Add a name to make it findable
+    key.position.set(-0.2, 1.05, -0.3);
+    key.castShadow = true;
+    this.scene.add(key);
   }
 
   private initThree() {

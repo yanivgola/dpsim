@@ -33,7 +33,7 @@ const ClearLogIcon = () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" v
 
 
 interface TraineeViewProps {
-  traineeId: string;
+  traineeIds: string[];
   onSessionComplete: (session: InvestigationSession) => Promise<void>;
   theme: Theme;
 }
@@ -73,7 +73,7 @@ function debounce<F extends (...args: any[]) => any>(func: F, waitFor: number) {
 }
 
 
-const TraineeView: React.FC<TraineeViewProps> = ({ traineeId, onSessionComplete, theme }) => {
+const TraineeView: React.FC<TraineeViewProps> = ({ traineeIds, onSessionComplete, theme }) => {
   const [selectedScenarioType, setSelectedScenarioType] = useState<ScenarioType>('ai_generated');
   const [selectedManualScenarioId, setSelectedManualScenarioId] = useState<string>('');
   const [availableManualScenarios, setAvailableManualScenarios] = useState<Scenario[]>([]);
@@ -252,7 +252,7 @@ const TraineeView: React.FC<TraineeViewProps> = ({ traineeId, onSessionComplete,
       }
       setViewState('generating_scenario');
       const topicToUse = customTopic || selectedTopic;
-      const scenario = await ApiService.generateScenario(selectedRole, selectedDifficulty, topicToUse, selectedAgentId);
+      const scenario = await ApiService.generateScenario(selectedRole, selectedDifficulty, topicToUse, selectedAgentId, traineeIds[0]); // For now, use the first trainee's ID for scenario generation
       if (scenario) {
         setCurrentScenario(scenario);
         setViewState('scenario_ready');
@@ -285,7 +285,7 @@ const TraineeView: React.FC<TraineeViewProps> = ({ traineeId, onSessionComplete,
 
     const newSession: InvestigationSession = {
       id: `session-${Date.now()}`,
-      traineeId: traineeId,
+      traineeIds: traineeIds,
       scenario: currentScenario,
       chatTranscript: [],
       startTime: Date.now(),
