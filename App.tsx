@@ -16,6 +16,8 @@ import ErrorBoundary from '@/components/common/ErrorBoundary';
 // Lazy load the heavy view components
 const TraineeView = lazy(() => import('@/components/TraineeView'));
 const TrainerView = lazy(() => import('@/components/TrainerView'));
+const Dashboard = lazy(() => import('@/components/Dashboard'));
+const Achievements = lazy(() => import('@/components/Achievements'));
 
 
 // Helper function to generate critical error HTML
@@ -70,6 +72,7 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [demoUsers, setDemoUsers] = useState<MockTrainee[]>([]);
   const [isAppLoading, setIsAppLoading] = useState(true);
+  const [appView, setAppView] = useState<'dashboard' | 'trainee' | 'trainer' | 'achievements'>('dashboard');
 
 
   useEffect(() => {
@@ -209,15 +212,48 @@ const App: React.FC = () => {
       </div>
     );
 
-    if (currentUser.role === UserRole.TRAINEE) {
+    if (appView === 'dashboard') {
       return (
         <ErrorBoundary>
           <Suspense fallback={loadingFallback}>
-            <TraineeView traineeId={currentUser.id} onSessionComplete={ApiService.saveSession} />
+            <Dashboard onNavigate={setAppView} />
+            <div className="fixed bottom-10 right-10">
+              <Button size="lg" onClick={() => setAppView(currentUser.role === UserRole.TRAINEE ? 'trainee' : 'trainer')}>
+                {currentUser.role === UserRole.TRAINEE ? 'התחל סימולציה חדשה' : 'עבור לתצוגת מדריך'}
+              </Button>
+            </div>
           </Suspense>
         </ErrorBoundary>
       );
-    } else if (currentUser.role === UserRole.TRAINER || currentUser.role === UserRole.SYSTEM_ADMIN) {
+    }
+
+    if (appView === 'achievements') {
+      return (
+        <ErrorBoundary>
+          <Suspense fallback={loadingFallback}>
+            <Achievements unlockedAchievements={currentUser.achievements || []} />
+             <div className="fixed bottom-10 right-10">
+              <Button size="lg" onClick={() => setAppView('dashboard')}>
+                חזור לדשבורד
+              </Button>
+            </div>
+          </Suspense>
+        </ErrorBoundary>
+      );
+    }
+
+    if (appView === 'trainee') {
+      return (
+        <ErrorBoundary>
+          <Suspense fallback={loadingFallback}>
+            <TraineeView traineeId={currentUser.id} onSessionComplete={session => {
+              ApiService.saveSession(session);
+              setAppView('dashboard');
+            }} />
+          </Suspense>
+        </ErrorBoundary>
+      );
+    } else if (appView === 'trainer') {
       return (
         <ErrorBoundary>
           <Suspense fallback={loadingFallback}>

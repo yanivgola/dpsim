@@ -5,3 +5,16 @@
 body {
   font-family: 'Inter', sans-serif;
 }
+
+@keyframes wavey {
+  0%, 40%, 100% {
+    transform: scaleY(0.4);
+  }
+  20% {
+    transform: scaleY(1);
+  }
+}
+
+.animate-wavey {
+  animation: wavey 1.2s infinite ease-in-out;
+}

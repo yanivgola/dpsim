@@ -35,8 +35,15 @@ const ClearLogIcon = () => <svg xmlns="http://www.w3.org/2000/svg" fill="none" v
 interface TraineeViewProps {
   traineeId: string;
   onSessionComplete: (session: InvestigationSession) => Promise<void>;
-  theme: Theme;
 }
+
+const TIPS = [
+    "זכור לשמור על קשר עין, גם אם האווטאר לא באמת רואה אותך.",
+    "שפת גוף היא המפתח. שים לב לתגובות האווטאר.",
+    "שאלות פתוחות יכולות לחשוף מידע שלא ציפית לו.",
+    "השתמש בשתיקה ככלי. לפעמים, שתיקה יכולה לגרום לנחקר לדבר.",
+    "בנה אמון עם הנחקר לפני שאתה מתחיל לשאול שאלות קשות.",
+];
 
 type ViewState =
   'initial_setup_type_selection' |
@@ -73,7 +80,8 @@ function debounce<F extends (...args: any[]) => any>(func: F, waitFor: number) {
 }
 
 
-const TraineeView: React.FC<TraineeViewProps> = ({ traineeId, onSessionComplete, theme }) => {
+const TraineeView: React.FC<TraineeViewProps> = ({ traineeId, onSessionComplete }) => {
+  const [isFocusMode, setIsFocusMode] = useState(false);
   const [selectedScenarioType, setSelectedScenarioType] = useState<ScenarioType>('ai_generated');
   const [selectedManualScenarioId, setSelectedManualScenarioId] = useState<string>('');
   const [availableManualScenarios, setAvailableManualScenarios] = useState<Scenario[]>([]);
@@ -664,9 +672,9 @@ const TraineeView: React.FC<TraineeViewProps> = ({ traineeId, onSessionComplete,
   };
   
   const renderInvestigationActiveView = () => (
-      <div className="flex-grow grid grid-cols-1 md:grid-cols-3 gap-4 overflow-hidden h-full">
+      <div className={`flex-grow grid ${isFocusMode ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-3'} gap-4 overflow-hidden h-full`}>
           {/* Side Panel */}
-          <div className="md:col-span-1 bg-neutral-100 dark:bg-neutral-800 rounded-lg p-4 flex flex-col overflow-y-auto h-full">
+          <div className={`md:col-span-1 bg-neutral-100 dark:bg-neutral-800 rounded-lg p-4 flex flex-col overflow-y-auto h-full ${isFocusMode ? 'hidden' : ''}`}>
               <div className="flex-shrink-0 border-b border-neutral-200 dark:border-neutral-700 mb-2">
                   <nav className="flex space-x-2 rtl:space-x-reverse">
                       <button onClick={() => setActiveSidePanelTab('scenario')} className={`py-2 px-4 text-sm font-medium rounded-t-md ${activeSidePanelTab === 'scenario' ? 'text-primary-600 dark:text-primary-400 border-b-2 border-primary-500' : 'text-neutral-600 dark:text-neutral-300'}`}>פרטי תרחיש</button>
@@ -693,7 +701,7 @@ const TraineeView: React.FC<TraineeViewProps> = ({ traineeId, onSessionComplete,
               </div>
           </div>
           {/* Main Chat Panel */}
-          <div className="md:col-span-2 rounded-lg flex flex-col overflow-hidden h-full relative">
+          <div className={`${isFocusMode ? 'col-span-1' : 'md:col-span-2'} rounded-lg flex flex-col overflow-hidden h-full relative`}>
               <div className="absolute inset-0 z-0">
                   <gdm-live-audio-visuals-3d
                       ref={visuals3dRef}
@@ -708,7 +716,7 @@ const TraineeView: React.FC<TraineeViewProps> = ({ traineeId, onSessionComplete,
               <div className="flex-grow overflow-y-auto p-4 flex flex-col justify-end bg-black/10 backdrop-blur-sm relative">
                 <div className="overflow-y-auto">
                   {chatMessages.map(msg => <ChatBubble key={msg.id} message={msg} />)}
-                  {isAiTyping && <ChatBubble message={{id: 'typing', sender: 'ai', text: '...', timestamp: Date.now()}}/>}
+                  {isAiTyping && <ChatBubble key="typing" message={{id: 'typing', sender: 'ai', text: '...', timestamp: Date.now()}}/>}
                   <div ref={chatEndRef} />
                 </div>
               </div>
@@ -727,6 +735,9 @@ const TraineeView: React.FC<TraineeViewProps> = ({ traineeId, onSessionComplete,
               <div className="absolute top-4 right-4 flex space-x-2 rtl:space-x-reverse">
                   <Button onClick={() => handleEndInvestigation(false)} variant="danger">{UI_TEXT.endInvestigationCall}</Button>
                   <Button onClick={handleRequestHint} variant="secondary" icon={<HintIcon />} isLoading={viewState === 'generating_hint'}>{UI_TEXT.requestHintButton}</Button>
+                  <Button onClick={() => setIsFocusMode(!isFocusMode)} variant="secondary" title={isFocusMode ? 'צא ממצב פוקוס' : 'עבור למצב פוקוס'}>
+                      {isFocusMode ? 'צא ממצב פוקוס' : 'מצב פוקוס'}
+                  </Button>
               </div>
           </div>
       </div>
@@ -809,7 +820,7 @@ const TraineeView: React.FC<TraineeViewProps> = ({ traineeId, onSessionComplete,
                 generating_feedback: UI_TEXT.generatingFeedback,
                 generating_hint: UI_TEXT.generatingHint
             };
-            return <div className="mt-10"><LoadingSpinner message={messages[viewState]} /></div>;
+            return <div className="mt-10"><LoadingSpinner message={messages[viewState]} tips={TIPS} /></div>;
             
         case 'scenario_ready':
             return (

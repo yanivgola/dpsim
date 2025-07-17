@@ -32,6 +32,7 @@ export interface User {
 export interface MockTrainee extends User {
   password?: string;
   sessions: InvestigationSession[];
+  achievements?: string[];
 }
 
 export interface SuspectProfile {
