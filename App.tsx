@@ -12,6 +12,7 @@ import Modal from '@/components/common/Modal';
 import * as ApiService from '@/services/ApiService'; // Use the new ApiService
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import ErrorBoundary from '@/components/common/ErrorBoundary';
+import Alert from '@/components/common/Alert';
 
 // Lazy load the heavy view components
 const TraineeView = lazy(() => import('@/components/TraineeView'));
@@ -73,6 +74,7 @@ const App: React.FC = () => {
   const [demoUsers, setDemoUsers] = useState<MockTrainee[]>([]);
   const [isAppLoading, setIsAppLoading] = useState(true);
   const [appView, setAppView] = useState<'dashboard' | 'trainee' | 'trainer' | 'achievements'>('dashboard');
+  const [alert, setAlert] = useState<{ type: 'success' | 'error' | 'warning' | 'info', title: string, message: string } | null>(null);
 
 
   useEffect(() => {
@@ -117,7 +119,7 @@ const App: React.FC = () => {
     const passwordToUse = userPassword || password;
 
     if (!emailToUse || !passwordToUse) {
-      setError(UI_TEXT.errorFieldsMissing);
+      setAlert({ type: 'error', title: 'שגיאה', message: UI_TEXT.errorFieldsMissing });
       setIsLoading(false);
       return;
     }
@@ -129,19 +131,20 @@ const App: React.FC = () => {
       setCurrentUser(loggedInUser);
       setIsLoginModalOpen(false);
       resetAuthForms();
+      setAlert({ type: 'success', title: 'התחברות מוצלחת', message: `ברוך הבא, ${loggedInUser.name}!` });
     } else {
-      setError(UI_TEXT.errorLoginFailed);
+      setAlert({ type: 'error', title: 'שגיאה', message: UI_TEXT.errorLoginFailed });
     }
   };
 
   const handleSignup = async () => {
     setError('');
     if (!fullName.trim() || !email.trim() || !password || !confirmPassword) {
-      setError(UI_TEXT.errorFieldsMissing);
+      setAlert({ type: 'error', title: 'שגיאה', message: UI_TEXT.errorFieldsMissing });
       return;
     }
     if (password !== confirmPassword) {
-      setError(UI_TEXT.errorPasswordsDontMatch);
+      setAlert({ type: 'error', title: 'שגיאה', message: UI_TEXT.errorPasswordsDontMatch });
       return;
     }
     
@@ -150,13 +153,13 @@ const App: React.FC = () => {
     const { user, error: signupError } = await ApiService.signup(fullName, email, password);
     
     if (signupError === 'Email exists') {
-        setError(UI_TEXT.errorEmailExists);
+        setAlert({ type: 'error', title: 'שגיאה', message: UI_TEXT.errorEmailExists });
         setIsLoading(false);
         return;
     }
 
     if (user) {
-        setError(UI_TEXT.accountCreatedSuccessfully);
+        setAlert({ type: 'success', title: 'הרשמה מוצלחת', message: UI_TEXT.accountCreatedSuccessfully });
         setTimeout(() => {
             setCurrentUser(user);
             setIsLoginModalOpen(false);
@@ -164,9 +167,13 @@ const App: React.FC = () => {
             setIsLoading(false);
         }, 1000);
     } else {
-        setError(UI_TEXT.errorCreatingAccount);
+        setAlert({ type: 'error', title: 'שגיאה', message: UI_TEXT.errorCreatingAccount });
         setIsLoading(false);
     }
+  };
+
+  const closeAlert = () => {
+    setAlert(null);
   };
 
 
@@ -271,7 +278,6 @@ const App: React.FC = () => {
             <div className="space-y-4">
                 <Input label={UI_TEXT.emailLabel} type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="your@email.com" title="הזן כתובת אימייל" disabled={isLoading} />
                 <Input label={UI_TEXT.passwordLabel} type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="********" title="הזן סיסמה" disabled={isLoading} />
-                {error && <p className="text-red-400 text-xs text-center" role="alert">{error}</p>}
                 <Button onClick={() => handleLogin()} className="w-full" isLoading={isLoading} title={UI_TEXT.loginButton + ": נסה להתחבר למערכת עם הפרטים שהוזנו"}>
                     {UI_TEXT.loginButton}
                 </Button>
@@ -284,7 +290,6 @@ const App: React.FC = () => {
             <Input label={UI_TEXT.emailLabel} type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="your@email.com" title="הזן כתובת אימייל" disabled={isLoading} />
             <Input label={UI_TEXT.passwordLabel} type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="לפחות 6 תווים" title="הזן סיסמה" disabled={isLoading} />
             <Input label={UI_TEXT.confirmPasswordLabel} type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="הקלד סיסמה שוב" title="אמת סיסמה" disabled={isLoading}/>
-            {error && <p className={`text-xs text-center ${error === UI_TEXT.accountCreatedSuccessfully ? 'text-green-400' : 'text-red-400'}`} role="alert">{error}</p>}
             <Button onClick={handleSignup} className="w-full" isLoading={isLoading} title={UI_TEXT.signupButton}>
                 {UI_TEXT.signupButton}
             </Button>
@@ -295,6 +300,11 @@ const App: React.FC = () => {
   return (
     <DeviceView>
       <PageLayout currentUserRole={currentUser ? currentUser.role : null} onLogout={handleLogout} toggleTheme={toggleTheme}>
+        {alert && (
+          <div className="fixed top-5 right-5 z-50">
+            <Alert type={alert.type} title={alert.title} message={alert.message} onClose={closeAlert} />
+          </div>
+        )}
         {isLoginModalOpen && !currentUser && (
           <Modal
             isOpen={isLoginModalOpen}

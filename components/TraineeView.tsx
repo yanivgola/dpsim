@@ -80,7 +80,7 @@ function debounce<F extends (...args: any[]) => any>(func: F, waitFor: number) {
 }
 
 
-const TraineeView: React.FC<TraineeViewProps> = ({ traineeId, onSessionComplete }) => {
+const TraineeView: React.FC<TraineeViewProps> = React.memo(({ traineeId, onSessionComplete }) => {
   const [isFocusMode, setIsFocusMode] = useState(false);
   const [selectedScenarioType, setSelectedScenarioType] = useState<ScenarioType>('ai_generated');
   const [selectedManualScenarioId, setSelectedManualScenarioId] = useState<string>('');
@@ -217,7 +217,7 @@ const TraineeView: React.FC<TraineeViewProps> = ({ traineeId, onSessionComplete 
       }
   }, [investigationLogSearchTerm, investigationLog]);
 
-  const handleStartNewSession = () => {
+  const handleStartNewSession = useCallback(() => {
     setCurrentSession(null);
     setCurrentScenario(null);
     setChatMessages([]);
@@ -228,7 +228,7 @@ const TraineeView: React.FC<TraineeViewProps> = ({ traineeId, onSessionComplete 
     setViewState('initial_setup_type_selection');
   };
 
-  const handleNextStep = () => {
+  const handleNextStep = useCallback(() => {
     const nextStateMap: Record<string, ViewState> = {
       initial_setup_type_selection: selectedScenarioType === 'manual' ? 'initial_setup_manual_scenario_selection' : 'initial_setup_agent_selection',
       initial_setup_manual_scenario_selection: 'initial_setup_review',
@@ -240,7 +240,7 @@ const TraineeView: React.FC<TraineeViewProps> = ({ traineeId, onSessionComplete 
     setViewState(nextStateMap[viewState]);
   };
   
-  const handleBackStep = () => {
+  const handleBackStep = useCallback(() => {
     const prevStateMap: Record<string, ViewState> = {
       initial_setup_manual_scenario_selection: 'initial_setup_type_selection',
       initial_setup_agent_selection: 'initial_setup_type_selection',
@@ -252,7 +252,7 @@ const TraineeView: React.FC<TraineeViewProps> = ({ traineeId, onSessionComplete 
     setViewState(prevStateMap[viewState]);
   };
 
-  const handleGenerateScenario = async () => {
+  const handleGenerateScenario = useCallback(async () => {
     if (selectedScenarioType === 'ai_generated') {
       if (!selectedRole || !selectedDifficulty || !(selectedTopic || customTopic) || !selectedAgentId) {
         setError(UI_TEXT.errorMissingSetupSelection);
@@ -285,7 +285,7 @@ const TraineeView: React.FC<TraineeViewProps> = ({ traineeId, onSessionComplete 
     }
   };
 
-  const handleStartInvestigation = async () => {
+  const handleStartInvestigation = useCallback(async () => {
     if (!currentScenario) {
       setError(UI_TEXT.noScenario);
       return;
@@ -320,7 +320,7 @@ const TraineeView: React.FC<TraineeViewProps> = ({ traineeId, onSessionComplete 
     }
   };
   
-  const speakAIResponse = (text: string, onEndCallback: () => void = () => {}) => {
+  const speakAIResponse = useCallback((text: string, onEndCallback: () => void = () => {}) => {
     if (!isAISpeechOutputEnabled || isRegularTtsMuted || !speechSynthesisAPI || text.trim() === '') {
         onEndCallback();
         return;
@@ -344,7 +344,7 @@ const TraineeView: React.FC<TraineeViewProps> = ({ traineeId, onSessionComplete 
     speechSynthesisAPI.speak(utterance);
   };
   
-  const handleSendMessage = async () => {
+  const handleSendMessage = useCallback(async () => {
     if (!userInput.trim() || !geminiChatInstance || !currentSession || isAiTyping) return;
 
     const userMessage: ChatMessage = {
@@ -390,7 +390,7 @@ const TraineeView: React.FC<TraineeViewProps> = ({ traineeId, onSessionComplete 
     }
   };
 
-  const handleEndInvestigation = async (confirmed: boolean = false) => {
+  const handleEndInvestigation = useCallback(async (confirmed: boolean = false) => {
     if (!confirmed) {
       setShowEndConfirmModal(true);
       return;
@@ -434,7 +434,7 @@ const TraineeView: React.FC<TraineeViewProps> = ({ traineeId, onSessionComplete 
     }
   };
 
-  const handleRequestHint = async () => {
+  const handleRequestHint = useCallback(async () => {
     if(!currentSession) return;
     setViewState('generating_hint');
     setIsAiTyping(true);
@@ -459,7 +459,7 @@ const TraineeView: React.FC<TraineeViewProps> = ({ traineeId, onSessionComplete 
     setIsAiTyping(false);
   };
   
-  const setupSpeechRecognition = () => {
+  const setupSpeechRecognition = useCallback(() => {
     if (!SpeechRecognitionAPI) {
       setIsSpeechApiSupported(false);
       return;
@@ -502,7 +502,7 @@ const TraineeView: React.FC<TraineeViewProps> = ({ traineeId, onSessionComplete 
 
   useEffect(setupSpeechRecognition, []);
   
-  const toggleVoiceInput = () => {
+  const toggleVoiceInput = useCallback(() => {
     if (!speechRecognitionInstance) return;
     if (isListening) {
       speechRecognitionInstance.stop();
@@ -550,7 +550,7 @@ const TraineeView: React.FC<TraineeViewProps> = ({ traineeId, onSessionComplete 
     };
   }, [liveAudioElementRef.current]);
 
-  const handleToggleLiveAudio = async (wantsAudio: boolean) => {
+  const handleToggleLiveAudio = useCallback(async (wantsAudio: boolean) => {
       setUserWantsLiveAudio(wantsAudio);
       if (wantsAudio && currentSession && liveAudioElementRef.current) {
           try {
