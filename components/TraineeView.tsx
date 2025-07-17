@@ -664,13 +664,13 @@ const TraineeView: React.FC<TraineeViewProps> = ({ traineeId, onSessionComplete,
   };
   
   const renderInvestigationActiveView = () => (
-      <div className="flex-grow grid grid-cols-1 lg:grid-cols-3 gap-4 overflow-hidden h-full">
+      <div className="flex-grow grid grid-cols-1 md:grid-cols-3 gap-4 overflow-hidden h-full">
           {/* Side Panel */}
-          <div className="lg:col-span-1 themed-card rounded-lg p-4 flex flex-col overflow-y-auto h-full">
-              <div className="flex-shrink-0 border-b themed-border mb-2">
+          <div className="md:col-span-1 bg-neutral-100 dark:bg-neutral-800 rounded-lg p-4 flex flex-col overflow-y-auto h-full">
+              <div className="flex-shrink-0 border-b border-neutral-200 dark:border-neutral-700 mb-2">
                   <nav className="flex space-x-2 rtl:space-x-reverse">
-                      <button onClick={() => setActiveSidePanelTab('scenario')} className={`py-2 px-4 text-sm font-medium rounded-t-md ${activeSidePanelTab === 'scenario' ? 'themed-text-primary border-b-2 border-primary-500' : 'themed-text-secondary'}`}>פרטי תרחיש</button>
-                      <button onClick={() => setActiveSidePanelTab('log')} className={`py-2 px-4 text-sm font-medium rounded-t-md ${activeSidePanelTab === 'log' ? 'themed-text-primary border-b-2 border-primary-500' : 'themed-text-secondary'}`}>יומן חקירה</button>
+                      <button onClick={() => setActiveSidePanelTab('scenario')} className={`py-2 px-4 text-sm font-medium rounded-t-md ${activeSidePanelTab === 'scenario' ? 'text-primary-600 dark:text-primary-400 border-b-2 border-primary-500' : 'text-neutral-600 dark:text-neutral-300'}`}>פרטי תרחיש</button>
+                      <button onClick={() => setActiveSidePanelTab('log')} className={`py-2 px-4 text-sm font-medium rounded-t-md ${activeSidePanelTab === 'log' ? 'text-primary-600 dark:text-primary-400 border-b-2 border-primary-500' : 'text-neutral-600 dark:text-neutral-300'}`}>יומן חקירה</button>
                   </nav>
               </div>
               <div className="flex-grow overflow-y-auto pr-1">
@@ -678,11 +678,11 @@ const TraineeView: React.FC<TraineeViewProps> = ({ traineeId, onSessionComplete,
                       renderScenarioDetailsCard()
                   ) : (
                       <div className="flex flex-col h-full">
-                          <h3 className="text-md font-semibold themed-text-primary mb-2">{UI_TEXT.investigationLogTitle}</h3>
+                          <h3 className="text-md font-semibold text-primary-600 dark:text-primary-400 mb-2">{UI_TEXT.investigationLogTitle}</h3>
                            <div className="flex-shrink-0 relative mb-2">
                                <Input value={investigationLogSearchTerm} onChange={e => setInvestigationLogSearchTerm(e.target.value)} placeholder={UI_TEXT.investigationLogSearchPlaceholder} className="pl-8" />
-                               <span className="absolute left-2 top-1/2 -translate-y-1/2 themed-text-secondary"><SearchIcon /></span>
-                               {investigationLogSearchTerm && <span className="text-xs absolute -bottom-4 left-0 themed-text-secondary">{UI_TEXT.investigationLogSearchResults(investigationLogSearchOccurrences)}</span>}
+                               <span className="absolute left-2 top-1/2 -translate-y-1/2 text-neutral-400 dark:text-neutral-500"><SearchIcon /></span>
+                               {investigationLogSearchTerm && <span className="text-xs absolute -bottom-4 left-0 text-neutral-500 dark:text-neutral-400">{UI_TEXT.investigationLogSearchResults(investigationLogSearchOccurrences)}</span>}
                            </div>
                            <Textarea value={investigationLog} onChange={e => setInvestigationLog(e.target.value)} className="flex-grow w-full text-sm" rows={10} />
                            <div className="flex-shrink-0 mt-2 flex justify-end">
@@ -693,7 +693,7 @@ const TraineeView: React.FC<TraineeViewProps> = ({ traineeId, onSessionComplete,
               </div>
           </div>
           {/* Main Chat Panel */}
-          <div className="lg:col-span-2 rounded-lg flex flex-col overflow-hidden h-full relative">
+          <div className="md:col-span-2 rounded-lg flex flex-col overflow-hidden h-full relative">
               <div className="absolute inset-0 z-0">
                   <gdm-live-audio-visuals-3d
                       ref={visuals3dRef}
@@ -707,14 +707,14 @@ const TraineeView: React.FC<TraineeViewProps> = ({ traineeId, onSessionComplete,
               </div>
               <div className="flex-grow overflow-y-auto p-4 flex flex-col justify-end bg-black/10 backdrop-blur-sm relative">
                 <div className="overflow-y-auto">
-                  {chatMessages.map(msg => <ChatBubble key={msg.id} message={msg} theme={theme} />)}
-                  {isAiTyping && <ChatBubble message={{id: 'typing', sender: 'ai', text: '...', timestamp: Date.now()}} theme={theme}/>}
+                  {chatMessages.map(msg => <ChatBubble key={msg.id} message={msg} />)}
+                  {isAiTyping && <ChatBubble message={{id: 'typing', sender: 'ai', text: '...', timestamp: Date.now()}}/>}
                   <div ref={chatEndRef} />
                 </div>
               </div>
               <div className="flex-shrink-0 p-4 bg-black/20">
                 {isLiveAudioModeActive ? (
-                  <div className="text-center p-2 rounded-lg bg-secondary-800 text-white">מצב שיחה קולית פעיל... ({liveAudioVisualState})</div>
+                  <div className="text-center p-2 rounded-lg bg-neutral-800 text-white">מצב שיחה קולית פעיל... ({liveAudioVisualState})</div>
                 ) : (
                   <form onSubmit={(e) => { e.preventDefault(); handleSendMessage(); }} className="flex items-start space-x-2 rtl:space-x-reverse">
                       <Textarea value={userInput} onChange={e => setUserInput(e.target.value)} onKeyDown={e => {if(e.key === 'Enter' && !e.shiftKey) {e.preventDefault(); handleSendMessage();}}} placeholder={UI_TEXT.typeYourMessage} className="flex-grow" rows={2} disabled={isAiTyping}/>

@@ -3,6 +3,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from '@/App'; // Assuming App.tsx provides a default export
 import '@/types'; // Ensure global augmentations from types.ts (e.g., for Window object) are loaded.
+import './index.css';
 
 console.log('[index.tsx] Script executing. Attempting to mount App...');
 

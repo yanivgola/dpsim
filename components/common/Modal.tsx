@@ -112,16 +112,13 @@ const Modal: React.FC<ModalProps> = ({
     '3xl': 'max-w-3xl',
   };
 
-  const isLightTheme = document.documentElement.classList.contains('light-theme');
-
   const modalBaseClasses = `rounded-lg shadow-xl w-full ${sizeClasses[size]} transform transition-all duration-300 ease-out overflow-hidden flex flex-col max-h-[90vh]`;
-  const darkThemeModalClasses = 'bg-secondary-800 text-secondary-200 border border-secondary-700';
-  const lightThemeModalClasses = 'bg-white text-secondary-900 border border-secondary-300';
+  const modalThemeClasses = "bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-200 border border-neutral-300 dark:border-neutral-700";
   
-  const titleClasses = isLightTheme ? 'text-primary-700' : 'text-primary-300';
-  const borderClasses = isLightTheme ? 'border-secondary-200' : 'border-secondary-700';
-  const footerBgClasses = isLightTheme ? 'bg-secondary-100' : 'bg-secondary-700 bg-opacity-50';
-  const childrenTextColor = isLightTheme ? 'text-secondary-800' : 'text-secondary-200';
+  const titleClasses = "text-primary-700 dark:text-primary-300";
+  const borderClasses = "border-neutral-200 dark:border-neutral-700";
+  const footerBgClasses = "bg-neutral-100 dark:bg-neutral-700/50";
+  const childrenTextColor = "text-neutral-800 dark:text-neutral-200";
 
   const backdropTransitionClass = isOpen ? "opacity-100" : "opacity-0";
   const modalContentTransitionClass = showContent && isOpen ? "opacity-100 scale-100" : "opacity-0 scale-95";
@@ -139,7 +136,7 @@ const Modal: React.FC<ModalProps> = ({
       <div 
         ref={modalRef}
         tabIndex={-1} // Make modal container focusable for fallback
-        className={`${modalBaseClasses} ${isLightTheme ? lightThemeModalClasses : darkThemeModalClasses} ${modalContentTransitionClass}`}
+        className={`${modalBaseClasses} ${modalThemeClasses} ${modalContentTransitionClass}`}
         onClick={(e) => e.stopPropagation()}
       >
         {title && (

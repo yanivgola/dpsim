@@ -17,13 +17,12 @@ const ScenarioBuilderView = lazy(() => import('@/components/trainer/ScenarioBuil
 
 interface TrainerViewProps {
     currentTrainer: User;
-    theme: Theme;
 }
 
 type TrainerTabId = 'progress' | 'intervention' | 'agents' | 'knowledge_base' | 'scenarios' | 'users' | 'settings';
 type ViewMode = 'dashboard' | 'scenario_builder';
 
-const TrainerView: React.FC<TrainerViewProps> = ({ currentTrainer, theme }) => {
+const TrainerView: React.FC<TrainerViewProps> = ({ currentTrainer }) => {
     const [activeTab, setActiveTab] = useState<TrainerTabId>('progress');
     const [viewMode, setViewMode] = useState<ViewMode>('dashboard');
     const [editingScenario, setEditingScenario] = useState<Scenario | null>(null);
@@ -63,13 +62,13 @@ const TrainerView: React.FC<TrainerViewProps> = ({ currentTrainer, theme }) => {
 
     const renderDashboardContent = () => {
         switch (activeTab) {
-            case 'progress': return <TraineeProgressTab theme={theme} />;
-            case 'intervention': return <LiveInterventionTab theme={theme} />;
-            case 'agents': return <ManageAIAgentsTab theme={theme} />;
-            case 'knowledge_base': return <KnowledgeBaseTab theme={theme} />;
-            case 'scenarios': return <ManualScenarioBuilderTab theme={theme} onEdit={handleEditScenario} onAddNew={handleAddNewScenario} />;
-            case 'users': return <ManageUsersTab theme={theme} />;
-            case 'settings': return <SettingsTab theme={theme} />;
+            case 'progress': return <TraineeProgressTab />;
+            case 'intervention': return <LiveInterventionTab />;
+            case 'agents': return <ManageAIAgentsTab />;
+            case 'knowledge_base': return <KnowledgeBaseTab />;
+            case 'scenarios': return <ManualScenarioBuilderTab onEdit={handleEditScenario} onAddNew={handleAddNewScenario} />;
+            case 'users': return <ManageUsersTab />;
+            case 'settings': return <SettingsTab />;
             default: return <div>{tabs.find(t => t.id === activeTab)?.label} content not implemented.</div>;
         }
     };
@@ -80,25 +79,20 @@ const TrainerView: React.FC<TrainerViewProps> = ({ currentTrainer, theme }) => {
                 <ScenarioBuilderView
                     scenario={editingScenario}
                     onBack={handleBackToDashboard}
-                    theme={theme}
                 />
             </Suspense>
         );
     }
     
-    const inactiveTabClass = theme === 'light' 
-        ? "text-secondary-600 hover:bg-secondary-200 hover:text-secondary-800 border-transparent" 
-        : "text-secondary-300 hover:bg-secondary-700 hover:text-secondary-100 border-transparent";
-    const activeTabClass = theme === 'light'
-        ? "text-primary-600 border-primary-500 bg-primary-50"
-        : "text-primary-400 border-primary-400 bg-secondary-700";
-    const tabContainerClass = `flex space-x-1 rtl:space-x-reverse border-b ${theme === 'light' ? 'border-secondary-200' : 'border-secondary-700'} mb-4 overflow-x-auto`;
+    const inactiveTabClass = "text-neutral-600 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700 hover:text-neutral-800 dark:hover:text-neutral-100 border-transparent";
+    const activeTabClass = "text-primary-600 dark:text-primary-400 border-primary-500 dark:border-primary-400 bg-primary-50 dark:bg-neutral-700";
+    const tabContainerClass = "flex space-x-1 rtl:space-x-reverse border-b border-neutral-200 dark:border-neutral-700 mb-4 overflow-x-auto";
 
     return (
-        <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
+        <div className="container mx-auto px-2 sm:px-4 lg:px-8">
             <div className="py-4">
-                <h1 className={`text-2xl font-bold ${theme === 'light' ? 'text-primary-700' : 'text-primary-300'}`}>{UI_TEXT.trainerDashboardTitle}</h1>
-                <p className={`text-sm ${theme === 'light' ? 'text-secondary-600' : 'text-secondary-400'}`}>ברוך הבא, {currentTrainer.name}.</p>
+                <h1 className="text-2xl font-bold text-primary-700 dark:text-primary-300">{UI_TEXT.trainerDashboardTitle}</h1>
+                <p className="text-sm text-neutral-600 dark:text-neutral-400">ברוך הבא, {currentTrainer.name}.</p>
             </div>
             
             <div className={tabContainerClass}>
@@ -126,7 +120,7 @@ const TrainerView: React.FC<TrainerViewProps> = ({ currentTrainer, theme }) => {
 
 // --- Knowledge Base Tab ---
 
-const KnowledgeBaseTab: React.FC<{ theme: Theme }> = ({ theme }) => {
+const KnowledgeBaseTab: React.FC = () => {
     const [documents, setDocuments] = useState<KnowledgeDocument[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [statusMessage, setStatusMessage] = useState('');
@@ -181,9 +175,9 @@ const KnowledgeBaseTab: React.FC<{ theme: Theme }> = ({ theme }) => {
     };
 
     return (
-        <div className={`p-4 rounded-lg space-y-4 ${theme === 'light' ? 'bg-white border' : 'themed-card'}`}>
+        <div className="p-4 rounded-lg space-y-4 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700">
             <div className="flex justify-between items-center">
-                <h3 className="text-lg font-semibold">{UI_TEXT.knowledgeBaseTitle}</h3>
+                <h3 className="text-lg font-semibold text-neutral-800 dark:text-neutral-100">{UI_TEXT.knowledgeBaseTitle}</h3>
                 <Button onClick={() => fileInputRef.current?.click()} isLoading={isLoading}>{UI_TEXT.uploadFileButton}</Button>
                 <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept=".txt,.md" />
             </div>
@@ -191,19 +185,19 @@ const KnowledgeBaseTab: React.FC<{ theme: Theme }> = ({ theme }) => {
 
              {isLoading ? <LoadingSpinner /> : (
                 <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y themed-border">
-                        <thead className={theme === 'light' ? 'bg-secondary-50' : 'bg-secondary-700'}>
+                    <table className="min-w-full divide-y divide-neutral-200 dark:divide-neutral-700">
+                        <thead className="bg-neutral-50 dark:bg-neutral-700">
                             <tr>
-                                <th className="px-6 py-3 text-right text-xs font-medium themed-text-secondary uppercase tracking-wider">{UI_TEXT.docName}</th>
-                                <th className="px-6 py-3 text-right text-xs font-medium themed-text-secondary uppercase tracking-wider">{UI_TEXT.docDate}</th>
-                                <th className="px-6 py-3 text-right text-xs font-medium themed-text-secondary uppercase tracking-wider">פעולות</th>
+                                <th className="px-6 py-3 text-right text-xs font-medium text-neutral-500 dark:text-neutral-300 uppercase tracking-wider">{UI_TEXT.docName}</th>
+                                <th className="px-6 py-3 text-right text-xs font-medium text-neutral-500 dark:text-neutral-300 uppercase tracking-wider">{UI_TEXT.docDate}</th>
+                                <th className="px-6 py-3 text-right text-xs font-medium text-neutral-500 dark:text-neutral-300 uppercase tracking-wider">פעולות</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y themed-border">
+                        <tbody className="divide-y divide-neutral-200 dark:divide-neutral-700">
                             {documents.map(doc => (
                                 <tr key={doc.id}>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">{doc.name}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm themed-text-content">{new Date(doc.uploadedAt).toLocaleString('he-IL')}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-neutral-900 dark:text-neutral-100">{doc.name}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-neutral-500 dark:text-neutral-300">{new Date(doc.uploadedAt).toLocaleString('he-IL')}</td>
                                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2 space-x-reverse">
                                         <Button onClick={() => setPreviewDoc(doc)} variant="ghost" size="sm">{UI_TEXT.preview}</Button>
                                         <Button onClick={() => handleDelete(doc.id)} variant="ghost" size="sm" className="text-red-500 hover:bg-red-100">{UI_TEXT.delete}</Button>
@@ -211,7 +205,7 @@ const KnowledgeBaseTab: React.FC<{ theme: Theme }> = ({ theme }) => {
                                 </tr>
                             ))}
                             {documents.length === 0 && (
-                                <tr><td colSpan={3} className="text-center py-4 text-sm themed-text-secondary">{UI_TEXT.noDataAvailable}</td></tr>
+                                <tr><td colSpan={3} className="text-center py-4 text-sm text-neutral-500 dark:text-neutral-400">{UI_TEXT.noDataAvailable}</td></tr>
                             )}
                         </tbody>
                     </table>
@@ -220,7 +214,7 @@ const KnowledgeBaseTab: React.FC<{ theme: Theme }> = ({ theme }) => {
 
             {previewDoc && (
                 <Modal isOpen={!!previewDoc} onClose={() => setPreviewDoc(null)} title={`${UI_TEXT.docPreviewTitle}: ${previewDoc.name}`} size="2xl">
-                    <pre className="whitespace-pre-wrap bg-secondary-800 text-secondary-200 p-4 rounded-md max-h-[60vh] overflow-y-auto text-xs">
+                    <pre className="whitespace-pre-wrap bg-neutral-800 text-neutral-200 p-4 rounded-md max-h-[60vh] overflow-y-auto text-xs">
                         {previewDoc.content}
                     </pre>
                     <div className="mt-4 flex justify-end">
@@ -235,7 +229,7 @@ const KnowledgeBaseTab: React.FC<{ theme: Theme }> = ({ theme }) => {
 
 // --- Advanced Trainee Progress Tab ---
 
-const TraineeProgressTab: React.FC<{ theme: Theme }> = ({ theme }) => {
+const TraineeProgressTab: React.FC = () => {
     const [allTrainees, setAllTrainees] = useState<MockTrainee[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [selectedTrainee, setSelectedTrainee] = useState<MockTrainee | null>(null);
@@ -271,27 +265,27 @@ const TraineeProgressTab: React.FC<{ theme: Theme }> = ({ theme }) => {
     }));
     
     return (
-        <div className={`p-4 rounded-lg ${theme === 'light' ? 'bg-white border' : 'themed-card'}`}>
-            <h3 className={`text-lg font-semibold mb-4 ${theme === 'light' ? 'text-secondary-800' : 'text-secondary-100'}`}>{UI_TEXT.traineeProgressChartTitle}</h3>
+        <div className="p-4 rounded-lg bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700">
+            <h3 className="text-lg font-semibold mb-4 text-neutral-800 dark:text-neutral-100">{UI_TEXT.traineeProgressChartTitle}</h3>
             {isLoading ? <LoadingSpinner /> : (
                 traineeProgressData.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                         {traineeProgressData.map((trainee) => (
-                            <button key={trainee.id} onClick={() => handleSelectTrainee(trainee.id)} className={`p-4 rounded-lg text-right themed-card shadow-lg hover:shadow-xl transition-shadow transform hover:-translate-y-1`}>
-                                <h4 className="font-bold text-lg themed-text-primary">{trainee.name}</h4>
-                                <p className="themed-text-secondary text-sm mt-2">{UI_TEXT.averageScoreLabel}: <span className="font-bold">{trainee.averageScore.toFixed(1)}</span></p>
-                                <p className="themed-text-secondary text-sm">{trainee.sessionCount} {UI_TEXT.simulationsCountSuffix}</p>
+                            <button key={trainee.id} onClick={() => handleSelectTrainee(trainee.id)} className="p-4 rounded-lg text-right bg-neutral-100 dark:bg-neutral-700 shadow-lg hover:shadow-xl transition-shadow transform hover:-translate-y-1">
+                                <h4 className="font-bold text-lg text-primary-600 dark:text-primary-400">{trainee.name}</h4>
+                                <p className="text-neutral-600 dark:text-neutral-300 text-sm mt-2">{UI_TEXT.averageScoreLabel}: <span className="font-bold">{trainee.averageScore.toFixed(1)}</span></p>
+                                <p className="text-neutral-600 dark:text-neutral-300 text-sm">{trainee.sessionCount} {UI_TEXT.simulationsCountSuffix}</p>
                             </button>
                         ))}
                     </div>
                 ) : (
-                    <p className="mt-2 text-sm text-center themed-text-secondary">{UI_TEXT.noDataAvailable}</p>
+                    <p className="mt-2 text-sm text-center text-neutral-500 dark:text-neutral-400">{UI_TEXT.noDataAvailable}</p>
                 )
             )}
 
             {selectedTrainee && (
                 <Modal isOpen={!!selectedTrainee} onClose={() => setSelectedTrainee(null)} title={UI_TEXT.traineeProgressCardTitle(selectedTrainee.name)} size="3xl">
-                    <TraineeAnalyticsContent trainee={selectedTrainee} theme={theme} />
+                    <TraineeAnalyticsContent trainee={selectedTrainee} />
                 </Modal>
             )}
         </div>
@@ -300,7 +294,7 @@ const TraineeProgressTab: React.FC<{ theme: Theme }> = ({ theme }) => {
 
 // --- Analytics Modal Content ---
 
-const TraineeAnalyticsContent: React.FC<{ trainee: MockTrainee; theme: Theme }> = ({ trainee, theme }) => {
+const TraineeAnalyticsContent: React.FC<{ trainee: MockTrainee }> = ({ trainee }) => {
     const completedSessions = trainee.sessions
         .filter(s => s.status === 'completed' && s.feedback && s.scenario.agentType === 'interrogation')
         .sort((a, b) => a.startTime - b.startTime);
@@ -308,46 +302,46 @@ const TraineeAnalyticsContent: React.FC<{ trainee: MockTrainee; theme: Theme }> 
     return (
         <div className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className={`p-4 rounded-lg ${theme === 'light' ? 'bg-secondary-50' : 'bg-secondary-800'}`}>
-                    <h4 className="font-semibold text-center mb-2 themed-text-primary">{UI_TEXT.scoreTrendChartTitle}</h4>
+                <div className="p-4 rounded-lg bg-neutral-100 dark:bg-neutral-800">
+                    <h4 className="font-semibold text-center mb-2 text-primary-600 dark:text-primary-400">{UI_TEXT.scoreTrendChartTitle}</h4>
                     {completedSessions.length > 1 ? (
-                        <ScoreTrendChart sessions={completedSessions} theme={theme} />
+                        <ScoreTrendChart sessions={completedSessions} />
                     ) : (
-                        <p className="text-center text-sm themed-text-secondary h-48 flex items-center justify-center">
+                        <p className="text-center text-sm text-neutral-500 dark:text-neutral-400 h-48 flex items-center justify-center">
                             {completedSessions.length === 1 ? 'דרושה יותר מסימולציה אחת להצגת מגמה.' : 'אין מספיק נתונים להצגת גרף.'}
                         </p>
                     )}
                 </div>
-                <div className={`p-4 rounded-lg ${theme === 'light' ? 'bg-secondary-50' : 'bg-secondary-800'}`}>
-                     <h4 className="font-semibold text-center mb-2 themed-text-primary">{UI_TEXT.skillsRadarChartTitle}</h4>
+                <div className="p-4 rounded-lg bg-neutral-100 dark:bg-neutral-800">
+                     <h4 className="font-semibold text-center mb-2 text-primary-600 dark:text-primary-400">{UI_TEXT.skillsRadarChartTitle}</h4>
                     {completedSessions.length > 0 ? (
-                        <ParameterRadarChart sessions={completedSessions} theme={theme} />
+                        <ParameterRadarChart sessions={completedSessions} />
                      ) : (
-                        <p className="text-center text-sm themed-text-secondary h-48 flex items-center justify-center">אין נתונים להצגת ניתוח מיומנויות.</p>
+                        <p className="text-center text-sm text-neutral-500 dark:text-neutral-400 h-48 flex items-center justify-center">אין נתונים להצגת ניתוח מיומנויות.</p>
                      )}
                 </div>
             </div>
             <div>
-                <h4 className="font-semibold mb-2 themed-text-primary">{UI_TEXT.completedSessionsTitle}</h4>
-                <div className="max-h-48 overflow-y-auto border themed-border rounded-md">
-                    <table className="min-w-full divide-y themed-border">
-                        <thead className={`sticky top-0 ${theme === 'light' ? 'bg-secondary-100' : 'bg-secondary-700'}`}>
+                <h4 className="font-semibold mb-2 text-primary-600 dark:text-primary-400">{UI_TEXT.completedSessionsTitle}</h4>
+                <div className="max-h-48 overflow-y-auto border border-neutral-200 dark:border-neutral-700 rounded-md">
+                    <table className="min-w-full divide-y divide-neutral-200 dark:divide-neutral-700">
+                        <thead className="sticky top-0 bg-neutral-100 dark:bg-neutral-700">
                             <tr>
-                                <th className="px-4 py-2 text-right text-xs font-medium themed-text-secondary uppercase">נושא</th>
-                                <th className="px-4 py-2 text-right text-xs font-medium themed-text-secondary uppercase">{UI_TEXT.sessionDateLabel}</th>
-                                <th className="px-4 py-2 text-right text-xs font-medium themed-text-secondary uppercase">{UI_TEXT.sessionScoreLabel}</th>
+                                <th className="px-4 py-2 text-right text-xs font-medium text-neutral-500 dark:text-neutral-300 uppercase">נושא</th>
+                                <th className="px-4 py-2 text-right text-xs font-medium text-neutral-500 dark:text-neutral-300 uppercase">{UI_TEXT.sessionDateLabel}</th>
+                                <th className="px-4 py-2 text-right text-xs font-medium text-neutral-500 dark:text-neutral-300 uppercase">{UI_TEXT.sessionScoreLabel}</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y themed-border">
+                        <tbody className="divide-y divide-neutral-200 dark:divide-neutral-700">
                             {completedSessions.map(session => (
                                 <tr key={session.id}>
-                                    <td className="px-4 py-2 text-sm">{session.scenario.caseType}</td>
-                                    <td className="px-4 py-2 text-sm">{new Date(session.startTime).toLocaleDateString('he-IL')}</td>
-                                    <td className="px-4 py-2 text-sm font-bold">{session.feedback?.overallScore}</td>
+                                    <td className="px-4 py-2 text-sm text-neutral-900 dark:text-neutral-100">{session.scenario.caseType}</td>
+                                    <td className="px-4 py-2 text-sm text-neutral-500 dark:text-neutral-300">{new Date(session.startTime).toLocaleDateString('he-IL')}</td>
+                                    <td className="px-4 py-2 text-sm font-bold text-neutral-900 dark:text-neutral-100">{session.feedback?.overallScore}</td>
                                 </tr>
                             ))}
                         </tbody>
-                     {completedSessions.length === 0 && <p className="text-center p-4 text-sm themed-text-secondary">אין סשנים שהושלמו.</p>}
+                     {completedSessions.length === 0 && <p className="text-center p-4 text-sm text-neutral-500 dark:text-neutral-400">אין סשנים שהושלמו.</p>}
                 </div>
             </div>
         </div>
@@ -356,7 +350,7 @@ const TraineeAnalyticsContent: React.FC<{ trainee: MockTrainee; theme: Theme }> 
 
 // --- SVG Chart Components ---
 
-const ParameterRadarChart: React.FC<{ sessions: InvestigationSession[], theme: Theme }> = ({ sessions, theme }) => {
+const ParameterRadarChart: React.FC<{ sessions: InvestigationSession[] }> = ({ sessions }) => {
     const parameterAverages = FEEDBACK_PARAMETER_NAMES.map(name => {
         const scores = sessions
             .map(s => s.feedback?.parameters.find(p => p.name === name)?.score)
@@ -386,28 +380,34 @@ const ParameterRadarChart: React.FC<{ sessions: InvestigationSession[], theme: T
     const dataPoints = parameterAverages.map((param, i) => getPoint(param.average, i));
     const dataPath = dataPoints.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x},${p.y}`).join(' ') + ' Z';
     
-    const textColor = theme === 'light' ? '#475569' : '#cbd5e1';
-    const gridColor = theme === 'light' ? '#e2e8f0' : '#334155';
-    const dataFillColor = theme === 'light' ? 'rgba(59, 130, 246, 0.4)' : 'rgba(96, 165, 250, 0.4)';
-    const dataStrokeColor = theme === 'light' ? '#2563eb' : '#60a5fa';
+    const textColor = "var(--text-color, #475569)";
+    const gridColor = "var(--grid-color, #e2e8f0)";
+    const dataFillColor = "var(--data-fill-color, rgba(59, 130, 246, 0.4))";
+    const dataStrokeColor = "var(--data-stroke-color, #2563eb)";
 
     return (
-        <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label={UI_TEXT.skillsRadarChartTitle}>
+        <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label={UI_TEXT.skillsRadarChartTitle} className="text-neutral-600 dark:text-neutral-300">
+            <style>{`
+                .text-color { fill: ${textColor}; }
+                .grid-color { stroke: ${gridColor}; }
+                .data-fill-color { fill: ${dataFillColor}; }
+                .data-stroke-color { stroke: ${dataStrokeColor}; }
+            `}</style>
             {/* Grid and Axes */}
             <g>
                 {[...Array(5)].map((_, i) => {
                     const level = (i + 1) * 2;
                     const levelPoints = axisPoints.map((_, j) => getPoint(level, j));
                     const levelPath = levelPoints.map((p, k) => `${k === 0 ? 'M' : 'L'} ${p.x},${p.y}`).join(' ') + ' Z';
-                    return <path key={i} d={levelPath} stroke={gridColor} fill="none" strokeWidth="0.5" />;
+                    return <path key={i} d={levelPath} className="grid-color" fill="none" strokeWidth="0.5" />;
                 })}
                 {axisPoints.map((p, i) => (
-                    <line key={i} x1={centerX} y1={centerY} x2={p.x} y2={p.y} stroke={gridColor} strokeWidth="0.5" />
+                    <line key={i} x1={centerX} y1={centerY} x2={p.x} y2={p.y} className="grid-color" strokeWidth="0.5" />
                 ))}
             </g>
             
             {/* Data Polygon */}
-            <path d={dataPath} fill={dataFillColor} stroke={dataStrokeColor} strokeWidth="1.5" />
+            <path d={dataPath} className="data-fill-color data-stroke-color" strokeWidth="1.5" />
 
             {/* Labels */}
             {axisPoints.map((p, i) => {
@@ -431,7 +431,7 @@ const ParameterRadarChart: React.FC<{ sessions: InvestigationSession[], theme: T
                     .trim();
 
                 return (
-                    <text key={i} x={labelX} y={labelY} fill={textColor} fontSize="8" textAnchor={textAnchor} dominantBaseline="middle">
+                    <text key={i} x={labelX} y={labelY} className="text-color" fontSize="8" textAnchor={textAnchor} dominantBaseline="middle">
                         <title>{parameterAverages[i].name}</title>
                         {shortName}
                     </text>
@@ -441,7 +441,7 @@ const ParameterRadarChart: React.FC<{ sessions: InvestigationSession[], theme: T
     );
 };
 
-const ScoreTrendChart: React.FC<{ sessions: InvestigationSession[], theme: Theme }> = ({ sessions, theme }) => {
+const ScoreTrendChart: React.FC<{ sessions: InvestigationSession[] }> = ({ sessions }) => {
     const width = 350, height = 200, padding = 30;
     const scores = sessions.map(s => s.feedback?.overallScore || 0);
     const pointCount = scores.length;
@@ -451,31 +451,36 @@ const ScoreTrendChart: React.FC<{ sessions: InvestigationSession[], theme: Theme
     
     const pathData = scores.map((score, i) => `${i === 0 ? 'M' : 'L'} ${xForIndex(i)} ${yForScore(score)}`).join(' ');
 
-    const textColor = theme === 'light' ? '#475569' : '#cbd5e1';
-    const lineColor = theme === 'light' ? '#94a3b8' : '#475569';
-    const pointColor = theme === 'light' ? '#3b82f6' : '#60a5fa';
+    const textColor = "var(--text-color, #475569)";
+    const lineColor = "var(--line-color, #94a3b8)";
+    const pointColor = "var(--point-color, #3b82f6)";
 
     return (
-        <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label={UI_TEXT.scoreTrendChartTitle}>
+        <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label={UI_TEXT.scoreTrendChartTitle} className="text-neutral-600 dark:text-neutral-300">
+            <style>{`
+                .text-color { fill: ${textColor}; }
+                .line-color { stroke: ${lineColor}; }
+                .point-color { stroke: ${pointColor}; fill: ${pointColor}; }
+            `}</style>
             {/* Y-Axis */}
-            <line x1={padding} y1={padding} x2={padding} y2={height - padding} stroke={lineColor} />
+            <line x1={padding} y1={padding} x2={padding} y2={height - padding} className="line-color" />
             {[0, 5, 10].map(score => (
                 <g key={score}>
-                    <line x1={padding - 5} y1={yForScore(score)} x2={padding} y2={yForScore(score)} stroke={lineColor} />
-                    <text x={padding - 10} y={yForScore(score) + 3} fill={textColor} textAnchor="end" fontSize="10">{score}</text>
+                    <line x1={padding - 5} y1={yForScore(score)} x2={padding} y2={yForScore(score)} className="line-color" />
+                    <text x={padding - 10} y={yForScore(score) + 3} className="text-color" textAnchor="end" fontSize="10">{score}</text>
                 </g>
             ))}
             {/* X-Axis */}
-            <line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding} stroke={lineColor} />
+            <line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding} className="line-color" />
             {scores.map((_, i) => (
                 <g key={i}>
-                    <line x1={xForIndex(i)} y1={height-padding} x2={xForIndex(i)} y2={height - padding + 5} stroke={lineColor} />
+                    <line x1={xForIndex(i)} y1={height-padding} x2={xForIndex(i)} y2={height - padding + 5} className="line-color" />
                 </g>
             ))}
             {/* Data Line and Points */}
-            <path d={pathData} fill="none" stroke={pointColor} strokeWidth="2" />
+            <path d={pathData} fill="none" className="point-color" strokeWidth="2" />
             {scores.map((score, i) => (
-                <circle key={i} cx={xForIndex(i)} cy={yForScore(score)} r="3" fill={pointColor} />
+                <circle key={i} cx={xForIndex(i)} cy={yForScore(score)} r="3" className="point-color" />
             ))}
         </svg>
     );

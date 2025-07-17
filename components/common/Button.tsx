@@ -20,7 +20,7 @@ const Button: React.FC<ButtonProps> = ({
   iconPosition = 'left',
   ...props
 }) => {
-  const baseStyle = "font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 transition-all duration-200 ease-in-out inline-flex items-center justify-center transform hover:scale-105 active:scale-95";
+  const baseStyle = "font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 transition-all duration-200 ease-in-out inline-flex items-center justify-center";
   
   const sizeStyles = {
     sm: "px-3 py-1.5 text-xs rounded",
@@ -29,15 +29,15 @@ const Button: React.FC<ButtonProps> = ({
   };
 
   const variantStyles = {
-    primary: "bg-primary-600 text-white hover:bg-primary-700 active:bg-primary-800 focus-visible:ring-primary-500 shadow-sm",
-    secondary: "bg-secondary-200 text-secondary-700 hover:bg-secondary-300 active:bg-secondary-400 focus-visible:ring-secondary-400 border border-secondary-300 shadow-sm",
+    primary: "bg-primary-600 text-white hover:bg-primary-700 active:bg-primary-800 focus-visible:ring-primary-500 shadow-sm dark:bg-primary-500 dark:hover:bg-primary-600 dark:active:bg-primary-700 dark:focus-visible:ring-primary-400",
+    secondary: "bg-neutral-200 text-neutral-700 hover:bg-neutral-300 active:bg-neutral-400 focus-visible:ring-neutral-400 border border-neutral-300 shadow-sm dark:bg-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-600 dark:active:bg-neutral-500 dark:focus-visible:ring-neutral-500 dark:border-neutral-600",
     danger: "bg-red-600 text-white hover:bg-red-700 active:bg-red-800 focus-visible:ring-red-500 shadow-sm",
-    ghost: "bg-transparent text-primary-600 hover:bg-primary-100 active:bg-primary-200 focus-visible:ring-primary-500",
+    ghost: "bg-transparent text-primary-600 hover:bg-primary-100 active:bg-primary-200 focus-visible:ring-primary-500 dark:text-primary-400 dark:hover:bg-primary-900 dark:active:bg-primary-800 dark:focus-visible:ring-primary-400",
   };
   
-  const disabledStyle = "opacity-60 cursor-not-allowed hover:scale-100 active:scale-100"; // Prevent scale on disabled
+  const disabledStyle = "opacity-60 cursor-not-allowed";
 
-  const iconSpacingClass = children ? (size === 'sm' ? "mx-1" : "mx-1.5") : ""; // Adjusted spacing
+  const iconSpacingClass = children ? (size === 'sm' ? "mx-1" : "mx-1.5") : "";
 
   return (
     <button
