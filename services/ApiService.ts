@@ -69,7 +69,7 @@ export const saveDefaultPromptOverride = (prompt: string): Promise<void> => Back
 export const removeDefaultPromptOverride = (): Promise<void> => Backend.removeDefaultPromptOverride();
 
 
-// --- GEMINI & CHAT (These are already async and call the real external service) ---
+// --- GEMINI & CHAT (Migrating to Backend) ---
 
 export const generateScenario = async (
     interrogateeRole: InterrogateeRole,
@@ -77,13 +77,57 @@ export const generateScenario = async (
     topic: string,
     customAgentId: string
 ): Promise<Scenario | null> => {
-    const allAgents = await Backend.getAiAgents();
-    const allDocs = await Backend.getKnowledgeDocuments();
-    return Gemini.generateScenario(interrogateeRole, difficulty, topic, customAgentId, allAgents, allDocs);
+    console.log("ApiService: Calling backend to generate scenario...");
+    try {
+        const response = await axios.post(`http://localhost:3001/api/generate-scenario`, {
+            role: interrogateeRole,
+            difficulty,
+            topic,
+            agentId: customAgentId
+        });
+        console.log("ApiService: Received scenario from backend:", response.data);
+        return response.data;
+    } catch (error) {
+        console.error("ApiService: Error generating scenario from backend:", error);
+        return null;
+    }
 };
 
-export const startChat = Gemini.startChatWithSuspect;
-export const sendMessage = Gemini.sendChatMessage;
-export const generateFeedback = Gemini.generateFeedbackForSession;
-export const generateContextualHint = Gemini.generateContextualHint;
-export const sendCommandToSession = Gemini.sendCommandToSession;
+export const startChat = async (scenario: Scenario): Promise<any | null> => {
+    console.warn("startChat is not yet migrated to the backend.");
+    return {
+        sendMessage: async (message: string, sc: Scenario, cmd: UserCommand | null) => {
+            console.warn("sendMessage is not yet migrated to the backend.");
+            return { text: `Error: Chat not migrated. Your message was: "${message}"`, directives: null };
+        }
+    };
+};
+
+export const sendMessage = async (
+    chat: any,
+    message: string,
+    scenario: Scenario,
+    userCommand: UserCommand | null
+): Promise<{ text: string | null; directives: any; toolCalledInfo?: any; }> => {
+    return chat.sendMessage(message, scenario, userCommand);
+};
+
+export const generateFeedback = async (
+    chatTranscript: ChatMessage[],
+    interrogateeRole: InterrogateeRole,
+    difficulty: DifficultyLevel,
+    topic: string,
+    usedHintsCount: number
+): Promise<Feedback | null> => {
+    console.warn("generateFeedback is not yet migrated to the backend.");
+    return null;
+};
+
+export const generateContextualHint = async (history: SimpleChatMessage[], scenario: Scenario): Promise<string | null> => {
+    console.warn("generateContextualHint is not yet migrated to the backend.");
+    return "Hint generation has not been migrated to the backend yet.";
+};
+
+export const sendCommandToSession = (sessionId: string, command: UserCommand): void => {
+    console.warn("sendCommandToSession is not yet migrated to the backend.");
+};

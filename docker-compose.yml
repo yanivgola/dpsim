@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80" # Expose frontend on host port 8080
+    networks:
+      - app-network
+
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001" # Expose backend on host port 3001
+    environment:
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY} # Pass the API key from a .env file in the root
+    networks:
+      - app-network
+    volumes:
+      # This ensures that the server has access to the most recent agent definitions
+      - ./public/assets:/app/public/assets:ro
+
+networks:
+  app-network:
+    driver: bridge
