@@ -2,10 +2,24 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import { GoogleGenAI, GenerateContentResponse } from '@google/genai';
-import { InterrogateeRole, DifficultyLevel, Scenario, LoadedAIAgent, KnowledgeDocument, GeminiJsonScenario } from './types';
+import { InterrogateeRole, DifficultyLevel, Scenario, LoadedAIAgent, KnowledgeDocument, GeminiJsonScenario, User, UserRole } from './types';
+import * as UserService from './services/UserService';
 import { UI_TEXT, GEMINI_MODEL_TEXT } from './constants';
 import fs from 'fs/promises';
 import path from 'path';
+import multer from 'multer';
+
+// --- Multer Setup for VRM uploads ---
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/vrm/')
+    },
+    filename: function (req, file, cb) {
+        // We can add logic here to prevent overwrites and sanitize filenames
+        cb(null, `${Date.now()}-${file.originalname}`)
+    }
+});
+const upload = multer({ storage: storage });
 
 // Load environment variables
 dotenv.config();
@@ -71,6 +85,86 @@ const getKnowledgeContextPrompt = (agent: LoadedAIAgent, docs: KnowledgeDocument
 app.get('/api/health', (req, res) => {
   res.send({ status: 'ok' });
 });
+
+import { ElevenLabsClient } from "@elevenlabs/elevenlabs-js";
+
+const elevenLabsClient = new ElevenLabsClient({
+  apiKey: process.env.ELEVENLABS_API_KEY,
+});
+
+app.post('/api/tts', async (req, res) => {
+    const { text } = req.body;
+
+    if (!text) {
+        return res.status(400).json({ error: 'Text is required for TTS.' });
+    }
+
+    try {
+        const audio = await elevenLabsClient.generate({
+            voice: "Rachel", // This can be customized later
+            text,
+            model_id: "eleven_multilingual_v2"
+        });
+
+        res.set('Content-Type', 'audio/mpeg');
+        audio.pipe(res);
+
+    } catch (error) {
+        console.error("Error generating TTS audio:", error);
+        res.status(500).json({ error: 'Failed to generate TTS audio.' });
+    }
+});
+
+app.post('/api/upload-vrm', upload.single('avatar'), (req, res) => {
+    if (!req.file) {
+        return res.status(400).send('No file uploaded.');
+    }
+    res.status(200).json({
+        message: 'File uploaded successfully',
+        filePath: `/uploads/vrm/${req.file.filename}`
+    });
+});
+
+import jwt from 'jsonwebtoken';
+
+// --- User Management Endpoints ---
+app.post('/api/users/login', async (req, res) => {
+    const { email, password } = req.body;
+    const user = await UserService.login(email, password);
+    if (user) {
+        const payload = { id: user.id, name: user.name, role: user.role };
+        const token = jwt.sign(payload, process.env.JWT_SECRET || 'your_default_secret', { expiresIn: '1h' });
+        res.json({ token, user });
+    } else {
+        res.status(401).json({ error: 'Invalid credentials' });
+    }
+});
+
+app.post('/api/users/signup', async (req, res) => {
+    const { fullName, email, password } = req.body;
+    const { user, error } = await UserService.signup(fullName, email, password);
+    if (error) {
+        return res.status(409).json({ error });
+    }
+    res.status(201).json(user);
+});
+
+app.get('/api/users', async (req, res) => {
+    const users = await UserService.getUsers();
+    res.json(users);
+});
+
+app.delete('/api/users/:id', async (req, res) => {
+    await UserService.deleteUser(req.params.id);
+    res.status(204).send();
+});
+
+app.put('/api/users/:id/role', async (req, res) => {
+    const { role } = req.body;
+    await UserService.updateUserRole(req.params.id, role);
+    res.status(200).send();
+});
+
 
 app.post('/api/generate-scenario', async (req, res) => {
     if (!ai) {
@@ -144,6 +238,16 @@ app.post('/api/generate-scenario', async (req, res) => {
         res.status(500).json({ error: 'Failed to generate scenario from AI.' });
     }
 });
+
+
+import mongoose from 'mongoose';
+
+// --- Database Connection ---
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/interrogation-simulator';
+
+mongoose.connect(MONGODB_URI)
+    .then(() => console.log("Successfully connected to MongoDB."))
+    .catch(err => console.error("Could not connect to MongoDB.", err));
 
 
 // Start the server

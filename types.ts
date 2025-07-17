@@ -505,6 +505,7 @@ export interface AIAgent {
     toolUsage?: boolean;
   };
   knowledgeBaseIds?: string[]; // New: For RAG
+  avatarUrl?: string; // New: URL to the VRM file
 }
 
 // Type for agents returned by loadAiAgents, ensuring isDefault and isEditable are always present.
