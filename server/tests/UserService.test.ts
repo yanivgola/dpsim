@@ -8,7 +8,7 @@ describe('UserService', () => {
         expect(user).toBeDefined();
         expect(user?.email).toBe('test@example.com');
 
-        const dbUser = await UserModel.findById((user as any)?._id);
+        const dbUser = await UserModel.findById(user?.id);
         expect(dbUser).toBeDefined();
     });
 

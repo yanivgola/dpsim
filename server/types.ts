@@ -24,6 +24,10 @@ export interface User {
     role: UserRole;
 }
 
+export interface UserWithPassword extends User {
+    password?: string;
+}
+
 export interface SuspectProfile {
     name: string;
     age: number;
@@ -73,6 +77,7 @@ export interface AIAgent {
     toolUsage?: boolean;
   };
   knowledgeBaseIds?: string[];
+  avatarUrl?: string;
 }
 
 export interface LoadedAIAgent extends AIAgent {

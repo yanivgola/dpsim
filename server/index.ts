@@ -127,6 +127,9 @@ app.post('/api/upload-vrm', upload.single('avatar'), (req, res) => {
 
 import jwt from 'jsonwebtoken';
 
+import * as AIAgentService from './services/AIAgentService';
+import * as ScenarioService from './services/ScenarioService';
+
 // --- User Management Endpoints ---
 app.post('/api/users/login', async (req, res) => {
     const { email, password } = req.body;
@@ -165,6 +168,48 @@ app.put('/api/users/:id/role', async (req, res) => {
     res.status(200).send();
 });
 
+
+// --- AI Agent Endpoints ---
+app.get('/api/agents', async (req, res) => {
+    const agents = await AIAgentService.getAgents();
+    res.json(agents);
+});
+
+app.post('/api/agents', async (req, res) => {
+    const newAgent = await AIAgentService.addAgent(req.body);
+    res.status(201).json(newAgent);
+});
+
+app.put('/api/agents/:id', async (req, res) => {
+    const updatedAgent = await AIAgentService.updateAgent(req.params.id, req.body);
+    res.json(updatedAgent);
+});
+
+app.delete('/api/agents/:id', async (req, res) => {
+    await AIAgentService.deleteAgent(req.params.id);
+    res.status(204).send();
+});
+
+// --- Scenario Endpoints ---
+app.get('/api/scenarios', async (req, res) => {
+    const scenarios = await ScenarioService.getScenarios();
+    res.json(scenarios);
+});
+
+app.post('/api/scenarios', async (req, res) => {
+    const newScenario = await ScenarioService.addScenario(req.body);
+    res.status(201).json(newScenario);
+});
+
+app.put('/api/scenarios/:id', async (req, res) => {
+    const updatedScenario = await ScenarioService.updateScenario(req.params.id, req.body);
+    res.json(updatedScenario);
+});
+
+app.delete('/api/scenarios/:id', async (req, res) => {
+    await ScenarioService.deleteScenario(req.params.id);
+    res.status(204).send();
+});
 
 app.post('/api/generate-scenario', async (req, res) => {
     if (!ai) {

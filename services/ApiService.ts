@@ -77,23 +77,48 @@ export const getTheme = Backend.getTheme;
 export const saveTheme = Backend.saveTheme;
 
 // --- SCENARIOS (Manual) ---
-export const getManualScenarios = (): Promise<Scenario[]> => Backend.getManualScenarios();
-export const getManualScenarioById = (id: string): Promise<Scenario | null> => Backend.getManualScenarioById(id);
-export const addManualScenario = (scenario: Scenario): Promise<Scenario> => Backend.addManualScenario(scenario);
-export const updateManualScenario = (scenario: Scenario): Promise<void> => Backend.updateManualScenario(scenario);
-export const deleteManualScenario = (scenarioId: string): Promise<void> => Backend.deleteManualScenario(scenarioId);
+export const getManualScenarios = async (): Promise<Scenario[]> => {
+    const response = await axios.get(`${API_BASE_URL}/scenarios`);
+    return response.data;
+};
+export const getManualScenarioById = async (id: string): Promise<Scenario | null> => {
+    const response = await axios.get(`${API_BASE_URL}/scenarios/${id}`);
+    return response.data;
+};
+export const addManualScenario = async (scenario: Scenario): Promise<Scenario> => {
+    const response = await axios.post(`${API_BASE_URL}/scenarios`, scenario);
+    return response.data;
+};
+export const updateManualScenario = async (scenario: Scenario): Promise<void> => {
+    await axios.put(`${API_BASE_URL}/scenarios/${scenario.id}`, scenario);
+};
+export const deleteManualScenario = async (scenarioId: string): Promise<void> => {
+    await axios.delete(`${API_BASE_URL}/scenarios/${scenarioId}`);
+};
 
 // --- KNOWLEDGE BASE ---
+// Not yet migrated, will be done in a future step
 export const getKnowledgeDocuments = (): Promise<KnowledgeDocument[]> => Backend.getKnowledgeDocuments();
 export const addKnowledgeDocument = (doc: { name: string, content: string }): Promise<void> => Backend.addKnowledgeDocument(doc);
 export const deleteKnowledgeDocument = (docId: string): Promise<void> => Backend.deleteKnowledgeDocument(docId);
 
 
 // --- AI AGENTS ---
-export const getAiAgents = (): Promise<LoadedAIAgent[]> => Backend.getAiAgents();
-export const addCustomAgent = (agent: AIAgent): Promise<void> => Backend.addCustomAgent(agent);
-export const updateCustomAgent = (agent: AIAgent): Promise<void> => Backend.updateCustomAgent(agent);
-export const deleteCustomAgent = (agentId: string): Promise<void> => Backend.deleteCustomAgent(agentId);
+export const getAiAgents = async (): Promise<LoadedAIAgent[]> => {
+    const response = await axios.get(`${API_BASE_URL}/agents`);
+    return response.data;
+};
+export const addCustomAgent = async (agent: AIAgent): Promise<void> => {
+    await axios.post(`${API_BASE_URL}/agents`, agent);
+};
+export const updateCustomAgent = async (agent: AIAgent): Promise<void> => {
+    await axios.put(`${API_BASE_URL}/agents/${agent.id}`, agent);
+};
+export const deleteCustomAgent = async (agentId: string): Promise<void> => {
+    await axios.delete(`${API_BASE_URL}/agents/${agentId}`);
+};
+
+// These are local settings, they can remain as they are for now
 export const saveDefaultPromptOverride = (prompt: string): Promise<void> => Backend.saveDefaultPromptOverride(prompt);
 export const removeDefaultPromptOverride = (): Promise<void> => Backend.removeDefaultPromptOverride();
 
